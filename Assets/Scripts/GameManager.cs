@@ -5,9 +5,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public bool Log = false;
+    public bool Log = true;
+    public readonly bool PlainRendering = true;
 
-    private Cloud Cloud;
+    private Galaxy Galaxy;
+
+    public Gradient StarGradient;
 
     private void Awake()
     {
@@ -25,14 +28,15 @@ public class GameManager : MonoBehaviour
 
     private void Refresh()
     {
+        // int seed = 587056704;
         int seed = (int)(Random.value * int.MaxValue);
         Random.InitState(seed);
         Debug.Log(seed);
-        if (Cloud != null)
+        if (Galaxy != null)
         {
-            Cloud.Destroy();   
+            Galaxy.Destroy();   
         }
-        Cloud = new Cloud(new Vector2(0, 0));
-        Cloud.Realize(new Vector2(0,0));
+        Galaxy = new Galaxy(new Vector2(0, 0));
+        Galaxy.Realize(new Vector2(0,0));
     }
 }

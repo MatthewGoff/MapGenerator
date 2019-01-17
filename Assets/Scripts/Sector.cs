@@ -3,32 +3,28 @@ using UnityEngine;
 
 public class Sector : Container
 {
-    private static readonly int MIN_CLOUDS = 4;
-    private static readonly int MAX_CLOUDS = 12;
-    private static readonly float INITIAL_RADIUS = 1;
+    private static readonly int MIN_CLOUDS = 3;
+    private static readonly int MAX_CLOUDS = 9;
 
     private GameObject Backdrop;
 
     public Sector(Vector2 position)
     {
         LocalPosition = position;
-        Radius = INITIAL_RADIUS;
+        Radius = 1f;
 
-        List<CircleCollider> colliders = new List<CircleCollider>();
+        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
         CreateClouds(Random.Range(MIN_CLOUDS, MAX_CLOUDS + 1), colliders);
 
-        BoundryConstricts = true;
-        BoundryStatic = false;
-        Distribute(colliders);
-        
+        Distribute(colliders, true, true);
+
         CreateSolarSystems(Clouds.Length * 2, colliders);
 
-        BoundryStatic = true;
-        Distribute(colliders);
+        Distribute(colliders, false, true);
 
-        CreateStars(SolarSystems.Length * 3, colliders);
+        CreateStars(SolarSystems.Length * 2, colliders);
 
-        Distribute(colliders);
+        Distribute(colliders, false, true);
 
         FinalizeRadius(colliders);
     }

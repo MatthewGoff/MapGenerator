@@ -1,35 +1,29 @@
 ﻿using UnityEngine;
 
-public class Star : CircleCollider
+public class Star : Container
 {
-    public static readonly float MIN_RADIUS = 0.5f;
-    public static readonly float MAX_RADIUS = 2.0f;
-    public static float AVERAGE_AREA
-    {
-        get
-        {
-            float averageRadius = (MIN_RADIUS + MAX_RADIUS) / 2f;
-            return Mathf.PI * Mathf.Pow(averageRadius, 2f);
-        }
-    }
+    public static readonly float MIN_RADIUS = 1f;
+    public static readonly float MAX_RADIUS = 4f;
 
-    private float Radius;
-    private Vector2 LocalPosition;
-    private bool Immovable;
     private GameObject GameObject;
 
     public Star(Vector2 position, bool immovable)
     {
-        Radius = Random.Range(0.5f, 2.0f);
+        Radius = Random.Range(MIN_RADIUS, MAX_RADIUS);
         LocalPosition = position;
         Immovable = immovable;
     }
 
     public void Realize(Vector2 parentPosition)
     {
-        GameObject prefab = (GameObject)Resources.Load("Prefabs/Star");
-        GameObject = GameObject.Instantiate(prefab, parentPosition + LocalPosition, Quaternion.identity);
-        GameObject.transform.localScale = new Vector3(Radius * 2f, Radius * 2f, 1f);
+        GameObject = new GameObject("Star");
+        GameObject.transform.position = parentPosition + LocalPosition;
+        GameObject.transform.localScale = new Vector3(Radius * 2, Radius * 2, 1f);
+
+        Texture2D texture = ChooseTexture();
+        Rect rect = new Rect(0, 0, 1024, 1024);
+        GameObject.AddComponent<SpriteRenderer>();
+        GameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, rect, new Vector2(0.5f, 0.5f), 1024);
     }
 
     public void Destroy()
@@ -37,21 +31,38 @@ public class Star : CircleCollider
         GameObject.Destroy(GameObject);
     }
 
-    public float GetRadius()
+    private Texture2D ChooseTexture()
     {
-        return 2f * Radius;
-    }
-
-    public Vector2 GetLocalPosition()
-    {
-        return LocalPosition;
-    }
-
-    public void Push(Vector2 vector)
-    {
-        if (!Immovable)
+        if (GameManager.Instance.PlainRendering)
         {
-            LocalPosition += vector;
+            return (Texture2D)Resources.Load("Sprites/WhiteCircle");
         }
+        else
+        {
+            return CreateRandomTexture();
+        }
+    }
+
+    private Texture2D CreateRandomTexture()
+    {
+        Texture2D background = (Texture2D)Resources.Load("Sprites/StarBackground");
+        Texture2D halo = (Texture2D)Resources.Load("Sprites/StarHalo");
+
+        halo = ColorTexture(halo, GameManager.Instance.StarGradient.Evaluate(Random.Range(0.0f, 1.0f)));
+        return Helpers.ComposeTextures(halo, background);
+    }
+
+    private Texture2D ColorTexture(Texture2D texture, Color color)
+    {
+        for (int x = 0; x < texture.width; x++)
+        {
+            for (int y = 0; y < texture.height; y++)
+            {
+                color.a = texture.GetPixel(x, y).a;
+                texture.SetPixel(x, y, color);
+            }
+        }
+        texture.Apply();
+        return texture;
     }
 }

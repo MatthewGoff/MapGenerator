@@ -1,10 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class EuclideanGraphTriangle
+﻿public class EuclideanGraphTriangle
 {
-
     private EuclideanGraphNode[] Corners;
     
     public EuclideanGraphTriangle(EuclideanGraphNode corner1, EuclideanGraphNode corner2, EuclideanGraphNode corner3)

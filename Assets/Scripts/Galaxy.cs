@@ -3,42 +3,34 @@ using UnityEngine;
 
 public class Galaxy : Container
 {
-    private static readonly int MIN_SECTORS = 12;
-    private static readonly int MAX_SECTORS = 12;
-    private static readonly float INITIAL_RADIUS = 1;
+    private static readonly int MIN_SECTORS = 9;
+    private static readonly int MAX_SECTORS = 9;
 
     private GameObject Backdrop;
 
     public Galaxy(Vector2 position)
     {
         LocalPosition = position;
-        Radius = INITIAL_RADIUS;
+        Radius = 1f;
 
-        List<CircleCollider> colliders = new List<CircleCollider>();
+        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
         CreateSectors(Random.Range(MIN_SECTORS, MAX_SECTORS + 1), colliders);
 
-        BoundryConstricts = true;
-        BoundryStatic = false;
-        GameManager.Instance.Log = true;
-        Distribute(colliders);
-        GameManager.Instance.Log = false;
+        Distribute(colliders, true, true);
 
-        /*
-        CreateClouds(Random.Range(MIN_SECTORS, MAX_SECTORS + 1), colliders);
+        CreateClouds(Sectors.Length * 2, colliders);
 
-        BoundryStatic = true;
-        Distribute(colliders);
+        Distribute(colliders, false, true);
 
         CreateSolarSystems(Clouds.Length * 2, colliders);
 
-        Distribute(colliders);
+        Distribute(colliders, false, true);
 
-        CreateStars(SolarSystems.Length * 3, colliders);
+        CreateStars(SolarSystems.Length * 2, colliders);
 
-        Distribute(colliders);
+        Distribute(colliders, false, true);
 
         FinalizeRadius(colliders);
-        */
     }
 
     public void Realize(Vector2 parentPosition)
@@ -48,7 +40,6 @@ public class Galaxy : Container
         {
             Sectors[i].Realize(parentPosition + LocalPosition);
         }
-        /*
         for (int i = 0; i < Clouds.Length; i++)
         {
             Clouds[i].Realize(parentPosition + LocalPosition);
@@ -61,7 +52,6 @@ public class Galaxy : Container
         {
             Stars[i].Realize(parentPosition + LocalPosition);
         }
-        */
     }
 
     private void CreateBackdrop(Vector2 position)
@@ -80,7 +70,6 @@ public class Galaxy : Container
         {
             Sectors[i].Destroy();
         }
-        /*
         for (int i = 0; i < Clouds.Length; i++)
         {
             Clouds[i].Destroy();
@@ -93,6 +82,5 @@ public class Galaxy : Container
         {
             Stars[i].Destroy();
         }
-        */
     }
 }

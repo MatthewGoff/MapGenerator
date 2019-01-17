@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Container : CircleCollider
+/// <summary>
+/// A specialized data structure which is also a circular rigid body. Meant to
+/// contain other  Containers and be contained within one. Its principle
+/// behaviour is to distribute its contents in euclidean space such that they
+/// all fit within its radius.
+/// </summary>
+public abstract class Container : CircleRigidBody
 {
     private static readonly float MARGIN = 0.5f;
+    private static readonly float OVERLAP_DISPLACEMENT = 4f / 4f;
 
-    protected Vector2 LocalPosition;
-    protected float Radius;
-
-    protected bool BoundryConstricts;
-    protected bool BoundryStatic;
-    protected float SmallestColliderRadius = float.MaxValue;
+    protected float SmallestContainerRadius = float.MaxValue;
     protected float MinimumPush;
 
     protected Sector[] Sectors;
@@ -18,7 +20,7 @@ public abstract class Container : CircleCollider
     protected SolarSystem[] SolarSystems;
     protected Star[] Stars;
 
-    protected void CreateSectors(int number, List<CircleCollider> colliders)
+    protected void CreateSectors(int number, List<CircleRigidBody> colliders)
     {
         Sectors = new Sector[number];
         for (int i = 0; i < Sectors.Length; i++)
@@ -26,11 +28,11 @@ public abstract class Container : CircleCollider
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Sectors[i] = new Sector(localPosition);
             colliders.Add(Sectors[i]);
-            SmallestColliderRadius = Mathf.Min(SmallestColliderRadius, Sectors[i].GetRadius());
+            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Sectors[i].Radius);
         }
     }
 
-    protected void CreateClouds(int number, List<CircleCollider> colliders)
+    protected void CreateClouds(int number, List<CircleRigidBody> colliders)
     {
         Clouds = new Cloud[number];
         for (int i = 0; i < Clouds.Length; i++)
@@ -38,11 +40,11 @@ public abstract class Container : CircleCollider
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Clouds[i] = new Cloud(localPosition);
             colliders.Add(Clouds[i]);
-            SmallestColliderRadius = Mathf.Min(SmallestColliderRadius, Clouds[i].GetRadius());
+            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Clouds[i].Radius);
         }
     }
 
-    protected void CreateSolarSystems(int number, List<CircleCollider> colliders)
+    protected void CreateSolarSystems(int number, List<CircleRigidBody> colliders)
     {
         SolarSystems = new SolarSystem[number];
         for (int i = 0; i < SolarSystems.Length; i++)
@@ -50,11 +52,11 @@ public abstract class Container : CircleCollider
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             SolarSystems[i] = new SolarSystem(localPosition);
             colliders.Add(SolarSystems[i]);
-            SmallestColliderRadius = Mathf.Min(SmallestColliderRadius, SolarSystems[i].GetRadius());
+            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, SolarSystems[i].Radius);
         }
     }
 
-    protected void CreateStars(int number, List<CircleCollider> colliders)
+    protected void CreateStars(int number, List<CircleRigidBody> colliders)
     {
         Stars = new Star[number];
         for (int i = 0; i < Stars.Length; i++)
@@ -62,41 +64,41 @@ public abstract class Container : CircleCollider
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Stars[i] = new Star(localPosition, false);
             colliders.Add(Stars[i]);
-            SmallestColliderRadius = Mathf.Min(SmallestColliderRadius, Stars[i].GetRadius());
+            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Stars[i].Radius);
         }
     }
 
-    protected void Distribute(List<CircleCollider> colliders)
+    protected void Distribute(List<CircleRigidBody> colliders, bool establishRadius, bool bounded)
     {
-        MinimumPush = SmallestColliderRadius / 10f;
+        MinimumPush = SmallestContainerRadius / 10f;
 
         float maxOverlap;
         int iterations = 0;
         do
         {
-            maxOverlap = DistributeTick(colliders);
+            if (establishRadius)
+            {
+                Radius += MinimumPush;
+            }
+            maxOverlap = DistributeTick(colliders, bounded);
             iterations++;
-        } while (maxOverlap > MinimumPush / 2 && iterations < 10000);
+        } while (maxOverlap > MARGIN && iterations < 1000);
         if (GameManager.Instance.Log)
         {
             Debug.Log(iterations);
         }
     }
 
-    private float DistributeTick(List<CircleCollider> colliders)
+    private float DistributeTick(List<CircleRigidBody> colliders, bool bounded)
     {
-        if (!BoundryStatic)
-        {
-            Radius -= MinimumPush;
-        }
         float maxOverlap = 0f;
-        foreach (CircleCollider collider1 in colliders)
+        foreach (CircleRigidBody collider1 in colliders)
         {
-            if (BoundryConstricts)
+            if (bounded)
             {
                 maxOverlap = Mathf.Max(maxOverlap, CheckBoundry(collider1));
             }
-            foreach (CircleCollider collider2 in colliders)
+            foreach (CircleRigidBody collider2 in colliders)
             {
                 maxOverlap = Mathf.Max(maxOverlap, CheckCollision(collider1, collider2));
             }
@@ -104,22 +106,22 @@ public abstract class Container : CircleCollider
         return maxOverlap;
     }
 
-    private float CheckCollision(CircleCollider collider1, CircleCollider collider2)
+    private float CheckCollision(CircleRigidBody collider1, CircleRigidBody collider2)
     {
         if (collider1 == collider2)
         {
             return 0;
         }
 
-        Vector2 distance = collider1.GetLocalPosition() - collider2.GetLocalPosition();
-        float minDistance = collider1.GetRadius() + collider2.GetRadius() + MARGIN;
+        Vector2 distance = collider1.LocalPosition - collider2.LocalPosition;
+        float minDistance = collider1.Radius + collider2.Radius + MARGIN;
         if (distance.magnitude < minDistance)
         {
             float overlap = minDistance - distance.magnitude;
-            float pushDistance = overlap / 2f + MinimumPush;
-            float sumOfSquares = Mathf.Pow(collider1.GetRadius(), 2f) + Mathf.Pow(collider2.GetRadius(), 2f);
-            float collider1Contribution = Mathf.Pow(collider1.GetRadius(), 2f) / sumOfSquares;
-            float collider2Contribution = Mathf.Pow(collider2.GetRadius(), 2f) / sumOfSquares;
+            float pushDistance = OVERLAP_DISPLACEMENT * overlap;// + MinimumPush;
+            float totalMass = collider1.Mass + collider2.Mass;
+            float collider1Contribution = collider2.Mass / totalMass;
+            float collider2Contribution = collider1.Mass / totalMass;
             collider1.Push(distance.normalized * collider1Contribution * pushDistance);
             collider2.Push(-distance.normalized * collider2Contribution * pushDistance);
             return overlap;
@@ -130,20 +132,16 @@ public abstract class Container : CircleCollider
         }
     }
 
-    private float CheckBoundry(CircleCollider collider1)
+    private float CheckBoundry(CircleRigidBody collider1)
     {
-        Vector2 distance = (Radius - collider1.GetLocalPosition().magnitude) * collider1.GetLocalPosition().normalized;
-        float minDistance = collider1.GetRadius() + MARGIN;
-        if (distance.magnitude < minDistance)
+        float distance = Radius - collider1.LocalPosition.magnitude;
+        float minDistance = collider1.Radius + MARGIN;
+        if (distance < minDistance)
         {
-            float overlap = minDistance - distance.magnitude;
-            float pushDistance = overlap / 2 + MinimumPush;
-            collider1.Push(-collider1.GetLocalPosition().normalized * pushDistance);
-            if (!BoundryStatic)
-            {
-                Radius += pushDistance / 2f;
-            }
-            return overlap;
+            float overlap = minDistance - distance;
+            float pushDistance = OVERLAP_DISPLACEMENT * overlap;// + MinimumPush;
+            collider1.Push(-collider1.LocalPosition.normalized * pushDistance);
+            return Mathf.Abs(overlap);
         }
         else
         {
@@ -151,28 +149,13 @@ public abstract class Container : CircleCollider
         }
     }
 
-    protected void FinalizeRadius(List<CircleCollider> colliders)
+    protected void FinalizeRadius(List<CircleRigidBody> colliders)
     {
         float farthestExtent = 0f;
-        foreach (CircleCollider collider in colliders)
+        foreach (CircleRigidBody collider in colliders)
         {
-            farthestExtent = Mathf.Max(farthestExtent, collider.GetLocalPosition().magnitude + collider.GetRadius());
+            farthestExtent = Mathf.Max(farthestExtent, collider.LocalPosition.magnitude + collider.Radius);
         }
         Radius = farthestExtent + MARGIN;
-    }
-
-    public float GetRadius()
-    {
-        return Radius;
-    }
-
-    public Vector2 GetLocalPosition()
-    {
-        return LocalPosition;
-    }
-
-    public void Push(Vector2 vector)
-    {
-        LocalPosition += vector;
     }
 }

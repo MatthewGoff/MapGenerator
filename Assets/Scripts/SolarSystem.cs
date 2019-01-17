@@ -3,9 +3,8 @@ using UnityEngine;
 
 public class SolarSystem : Container
 {
-    private static readonly int MIN_PLANETS = 4;
-    private static readonly int MAX_PLANETS = 12;
-    private static readonly float INITIAL_RADIUS = 1;
+    private static readonly int MIN_PLANETS = 3;
+    private static readonly int MAX_PLANETS = 9;
 
     private Star Star;
     private Planet[] Planets;
@@ -14,21 +13,19 @@ public class SolarSystem : Container
 	public SolarSystem(Vector2 position)
     {
         LocalPosition = position;
-        Radius = INITIAL_RADIUS;
+        Radius = 5f;
 
-        List<CircleCollider> colliders = new List<CircleCollider>();
+        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
         Star = new Star(new Vector2(0, 0), true);
         colliders.Add(Star);
 
         CreatePlanets(Random.Range(MIN_PLANETS, MAX_PLANETS + 1), colliders);
-        
-        BoundryConstricts = false;
-        BoundryStatic = true;
-        Distribute(colliders);
+
+        Distribute(colliders, false, false);
         FinalizeRadius(colliders);
     }
 
-    private void CreatePlanets(int number, List<CircleCollider> colliders)
+    private void CreatePlanets(int number, List<CircleRigidBody> colliders)
     {
         Planets = new Planet[number];
         for (int i = 0; i < Planets.Length; i++)
@@ -36,7 +33,7 @@ public class SolarSystem : Container
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Planets[i] = new Planet(localPosition);
             colliders.Add(Planets[i]);
-            SmallestColliderRadius = Mathf.Min(SmallestColliderRadius, Planets[i].GetRadius());
+            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Planets[i].Radius);
         }
     }
 
@@ -48,7 +45,6 @@ public class SolarSystem : Container
         {
             Planets[i].Realize(parentPosition + LocalPosition);
         }
-        
     }
 
     private void CreateBackdrop(Vector2 position)

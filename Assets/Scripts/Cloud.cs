@@ -3,29 +3,25 @@ using UnityEngine;
 
 public class Cloud : Container
 {
-    private static readonly int MIN_SOLAR_SYSTEMS = 4;
-    private static readonly int MAX_SOLAR_SYSTEMS = 12;
-    private static readonly float INITIAL_RADIUS = 1;
+    private static readonly int MIN_SOLAR_SYSTEMS = 3;
+    private static readonly int MAX_SOLAR_SYSTEMS = 9;
 
     private GameObject Backdrop;
 
     public Cloud(Vector2 position)
     {
         LocalPosition = position;
-        Radius = INITIAL_RADIUS;
+        Radius = 1f;
 
-        List<CircleCollider> colliders = new List<CircleCollider>();
+        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
         CreateSolarSystems(Random.Range(MIN_SOLAR_SYSTEMS, MAX_SOLAR_SYSTEMS + 1), colliders);
 
-        BoundryConstricts = true;
-        BoundryStatic = false;
-        Distribute(colliders);
+        Distribute(colliders, true, true);
 
         CreateStars(SolarSystems.Length * 2, colliders);
 
-        BoundryStatic = true;
-        Distribute(colliders);
-
+        Distribute(colliders, true, true);
+        
         FinalizeRadius(colliders);
     }
 

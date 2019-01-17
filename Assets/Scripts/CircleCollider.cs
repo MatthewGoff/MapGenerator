@@ -1,9 +1,24 @@
 ﻿using UnityEngine;
 
-public interface CircleCollider
+public abstract class CircleRigidBody
 {
-    float GetRadius();
-    Vector2 GetLocalPosition();
+    protected bool Immovable = false;
 
-    void Push(Vector2 vector);
+    public Vector2 LocalPosition;
+    public float Radius;
+    public float Mass
+    {
+        get
+        {
+            return Mathf.Pow(Radius, 2f);
+        }
+    }
+
+    public void Push(Vector2 vector)
+    {
+        if (!Immovable)
+        {
+            LocalPosition += vector;
+        }
+    }
 }
