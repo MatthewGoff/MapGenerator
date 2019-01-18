@@ -8,7 +8,7 @@ public class Star : Container
     private GameObject GameObject;
     private int PPU;
 
-    public Star(Vector2 localPosition, bool immovable) : base(localPosition, Random.Range(MIN_RADIUS, MAX_RADIUS))
+    public Star(Vector2 localPosition, bool immovable) : base(localPosition, Random.Range(MIN_RADIUS, MAX_RADIUS), MAX_RADIUS)
     {
         Immovable = immovable;
     }

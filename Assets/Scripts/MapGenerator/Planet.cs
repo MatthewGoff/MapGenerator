@@ -10,7 +10,7 @@ public class Planet : Container
     private GameObject GameObject;
     private int PPU;
 
-	public Planet(Vector2 localPosition) : base(localPosition, Random.Range(0.5f, 2.0f))
+	public Planet(Vector2 localPosition) : base(localPosition, Random.Range(0.5f, 2.0f), MAX_RADIUS)
     {
 
     }

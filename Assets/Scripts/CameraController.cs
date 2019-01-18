@@ -27,7 +27,7 @@ public class CameraController : MonoBehaviour
     {
         if (GameManager.Instance.LastQuadtree != null)
         {
-            //DrawQuadtree();
+            DrawQuadtree();
         }
     }
 

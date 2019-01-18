@@ -1,38 +1,35 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class Galaxy : Container
+public class Group : Container
 {
-    private static readonly int MIN_SECTORS = 9;
-    private static readonly int MAX_SECTORS = 9;
+    private static readonly int MIN_GALAXIES = 9;
+    private static readonly int MAX_GALAXIES = 9;
+    public static readonly float MAX_RADIUS = Galaxy.MAX_RADIUS * 4;
 
     private GameObject Backdrop;
 
-    public Galaxy(Vector2 localPosition) : base(localPosition, 1f)
+    public Group(Vector2 localPosition) : base(localPosition, 1f, MAX_RADIUS)
     {
-        List<Container> containers = new List<Container>();
-        CreateSectors(Random.Range(MIN_SECTORS, MAX_SECTORS + 1), containers);
-
-        Distribute(containers, true, true);
-
-        CreateClouds(Sectors.Length * 2, containers);
-
-        Distribute(containers, false, true);
-
-        CreateSolarSystems(Clouds.Length * 2, containers);
-
-        Distribute(containers, false, true);
-
-        CreateStars(SolarSystems.Length * 2, containers);
-
-        Distribute(containers, false, true);
-
-        FinalizeRadius(containers);
+        CreateGalaxies(Random.Range(MIN_GALAXIES, MAX_GALAXIES + 1));
+        Distribute(true, true);
+        CreateSectors(Galaxies.Length * 2);
+        Distribute(false, true);
+        CreateClouds(Sectors.Length * 2);
+        Distribute(false, true);
+        CreateSolarSystems(Clouds.Length * 2);
+        Distribute(false, true);
+        CreateStars(SolarSystems.Length * 2);
+        Distribute(false, true);
+        FinalizeContainer();
     }
 
     public void Realize(Vector2 parentPosition)
     {
         CreateBackdrop(parentPosition + LocalPosition);
+        for (int i = 0; i < Galaxies.Length; i++)
+        {
+            Galaxies[i].Realize(parentPosition + LocalPosition);
+        }
         for (int i = 0; i < Sectors.Length; i++)
         {
             Sectors[i].Realize(parentPosition + LocalPosition);
@@ -56,13 +53,17 @@ public class Galaxy : Container
         GameObject prefab = (GameObject)Resources.Load("Prefabs/WhiteCircle");
         Backdrop = GameObject.Instantiate(prefab, position, Quaternion.identity);
         Backdrop.transform.localScale = new Vector3(Radius * 2f, Radius * 2f, 1f);
-        Backdrop.GetComponent<SpriteRenderer>().sortingOrder = -4;
-        Backdrop.GetComponent<SpriteRenderer>().color = new Color(0.2f, 0.2f, 0.2f);
+        Backdrop.GetComponent<SpriteRenderer>().sortingOrder = -5;
+        Backdrop.GetComponent<SpriteRenderer>().color = new Color(0.1f, 0.1f, 0.1f);
     }
 
     public void Destroy()
     {
         GameObject.Destroy(Backdrop);
+        for (int i = 0; i < Galaxies.Length; i++)
+        {
+            Galaxies[i].Destroy();
+        }
         for (int i = 0; i < Sectors.Length; i++)
         {
             Sectors[i].Destroy();

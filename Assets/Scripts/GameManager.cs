@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public bool Log = true;
     public readonly bool PlainRendering = true;
 
-    private Universe Universe;
+    private Group Group;
 
     public Gradient StarGradient;
     public Quadtree LastQuadtree;
@@ -29,19 +29,19 @@ public class GameManager : MonoBehaviour
 
     private void Refresh()
     {
-        // int seed = 64834568;
-        int seed = (int)(Random.value * int.MaxValue);
+        int seed = 865259136;
+        // int seed = (int)(Random.value * int.MaxValue);
         Random.InitState(seed);
         Debug.Log(seed);
-        if (Universe != null)
+        if (Group != null)
         {
-            //Universe.Destroy();   
+            Group.Destroy();   
         }
         float time = Time.realtimeSinceStartup;
-        Universe = new Universe(new Vector2(0, 0));
+        Group = new Group(new Vector2(0, 0));
         Debug.Log("Setup Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
         time = Time.realtimeSinceStartup;
-        Universe.Realize(new Vector2(0,0));
+        Group.Realize(new Vector2(0,0));
         Debug.Log("Render Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
     }
 }

@@ -3,75 +3,92 @@ using UnityEngine;
 
 /// <summary>
 /// A specialized data structure which is also a circular rigid body. Meant to
-/// contain other  Containers and be contained within one. Its principle
+/// contain other Containers and be contained within one. Its principle
 /// behaviour is to distribute its contents in euclidean space such that they
-/// all fit within its radius.
+/// all fit within its radius without overlapping.
 /// </summary>
 public abstract class Container : CircleRigidBody
 {
-    private static readonly float MARGIN = 0.5f;
+    public static readonly float COLLISION_MARGIN = 0.5f;
+    public static readonly float MAX_ITERATIONS = 1000;
 
     protected float SmallestContainerRadius = float.MaxValue;
 
+    protected Galaxy[] Galaxies;
     protected Sector[] Sectors;
     protected Cloud[] Clouds;
     protected SolarSystem[] SolarSystems;
     protected Star[] Stars;
 
-    public Container(Vector2 localPosition, float radius) : base(localPosition, radius)
-    {
+    protected Quadtree Quadtree;
+    public Quadtree MyQuad;
 
+    public Container(Vector2 localPosition, float radius, float quadtreeRadius) : base(localPosition, radius)
+    {
+        Quadtree = new Quadtree(this, quadtreeRadius, -quadtreeRadius, -quadtreeRadius, quadtreeRadius);
     }
 
-    protected void CreateSectors(int number, List<Container> containers)
+    protected void CreateGalaxies(int number)
+    {
+        Galaxies = new Galaxy[number];
+        for (int i = 0; i < Galaxies.Length; i++)
+        {
+            Vector2 localPosition = Random.insideUnitCircle * Radius;
+            Galaxies[i] = new Galaxy(localPosition);
+            Quadtree.Insert(Galaxies[i]);
+            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Galaxies[i].Radius);
+        }
+    }
+
+    protected void CreateSectors(int number)
     {
         Sectors = new Sector[number];
         for (int i = 0; i < Sectors.Length; i++)
         {
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Sectors[i] = new Sector(localPosition);
-            containers.Add(Sectors[i]);
+            Quadtree.Insert(Sectors[i]);
             SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Sectors[i].Radius);
         }
     }
 
-    protected void CreateClouds(int number, List<Container> containers)
+    protected void CreateClouds(int number)
     {
         Clouds = new Cloud[number];
         for (int i = 0; i < Clouds.Length; i++)
         {
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Clouds[i] = new Cloud(localPosition);
-            containers.Add(Clouds[i]);
+            Quadtree.Insert(Clouds[i]);
             SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Clouds[i].Radius);
         }
     }
 
-    protected void CreateSolarSystems(int number, List<Container> containers)
+    protected void CreateSolarSystems(int number)
     {
         SolarSystems = new SolarSystem[number];
         for (int i = 0; i < SolarSystems.Length; i++)
         {
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             SolarSystems[i] = new SolarSystem(localPosition);
-            containers.Add(SolarSystems[i]);
+            Quadtree.Insert(SolarSystems[i]);
             SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, SolarSystems[i].Radius);
         }
     }
 
-    protected void CreateStars(int number, List<Container> containers)
+    protected void CreateStars(int number)
     {
         Stars = new Star[number];
         for (int i = 0; i < Stars.Length; i++)
         {
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Stars[i] = new Star(localPosition, false);
-            containers.Add(Stars[i]);
+            Quadtree.Insert(Stars[i]);
             SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Stars[i].Radius);
         }
     }
 
-    protected void Distribute(List<Container> containers, bool establishRadius, bool bounded)
+    protected void Distribute(bool growRadius, bool bounded)
     {
         float radiusIncrement = SmallestContainerRadius / 10f;
 
@@ -79,60 +96,34 @@ public abstract class Container : CircleRigidBody
         int iterations = 0;
         do
         {
-            if (establishRadius)
+            if (growRadius)
             {
                 Radius += radiusIncrement;
             }
-            maxOverlap = DistributeTick(containers, bounded);
+            maxOverlap = Quadtree.ResolveCollisions(bounded);
             iterations++;
-        } while (maxOverlap > MARGIN && iterations < 10000);
+        } while (maxOverlap > COLLISION_MARGIN && iterations < MAX_ITERATIONS);
+        if (iterations >= MAX_ITERATIONS)
+        {
+            Radius += radiusIncrement;
+            Distribute(growRadius, bounded);
+        }
         if (GameManager.Instance.Log)
         {
             Debug.Log(iterations);
         }
+        GameManager.Instance.LastQuadtree = Quadtree;
     }
 
-    private float DistributeTick(List<Container> containers, bool bounded)
-    {
-        Quadtree quadtree = new Quadtree(5, MARGIN, Radius * 2, -Radius * 2, -Radius * 2, Radius * 2);
-        float maxOverlap = 0f;
-        foreach (Container container in containers)
-        {
-            if (bounded)
-            {
-                maxOverlap = Mathf.Max(maxOverlap, CheckBoundry(container));
-            }
-            quadtree.Insert(container);
-        }
-        GameManager.Instance.LastQuadtree = quadtree;
-        maxOverlap = Mathf.Max(maxOverlap, quadtree.ResolveCollisions());
-        return maxOverlap;
-    }
-
-    private float CheckBoundry(Container container)
-    {
-        float distance = Radius - container.LocalPosition.magnitude;
-        float minDistance = container.Radius + MARGIN;
-        if (distance < minDistance)
-        {
-            float overlap = minDistance - distance;
-            float pushDistance = overlap;
-            container.Push(-container.LocalPosition.normalized * pushDistance);
-            return Mathf.Abs(overlap);
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    protected void FinalizeRadius(List<Container> containers)
+    protected void FinalizeContainer()
     {
         float farthestExtent = 0f;
-        foreach (Container container in containers)
+        foreach (Container container in Quadtree.GetAllContents())
         {
             farthestExtent = Mathf.Max(farthestExtent, container.LocalPosition.magnitude + container.Radius);
+            container.MyQuad = null;
         }
-        Radius = farthestExtent + MARGIN;
+        Quadtree = null;
+        Radius = farthestExtent + COLLISION_MARGIN;
     }
 }

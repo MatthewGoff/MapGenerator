@@ -1,35 +1,32 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SolarSystem : Container
 {
     private static readonly int MIN_PLANETS = 3;
     private static readonly int MAX_PLANETS = 9;
+    public static readonly float MAX_RADIUS = Planet.MAX_RADIUS * 6;
 
     private Star Star;
     private Planet[] Planets;
     private GameObject Backdrop;
 
-    public SolarSystem(Vector2 position) : base (position, 5f)
+    public SolarSystem(Vector2 position) : base (position, 5f, MAX_RADIUS)
     {
-        List<Container> containers = new List<Container>();
         Star = new Star(new Vector2(0, 0), true);
-        containers.Add(Star);
-
-        CreatePlanets(Random.Range(MIN_PLANETS, MAX_PLANETS + 1), containers);
-
-        Distribute(containers, false, false);
-        FinalizeRadius(containers);
+        Quadtree.Insert(Star);
+        CreatePlanets(Random.Range(MIN_PLANETS, MAX_PLANETS + 1));
+        Distribute(false, false);
+        FinalizeContainer();
     }
 
-    private void CreatePlanets(int number, List<Container> containers)
+    private void CreatePlanets(int number)
     {
         Planets = new Planet[number];
         for (int i = 0; i < Planets.Length; i++)
         {
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Planets[i] = new Planet(localPosition);
-            containers.Add(Planets[i]);
+            Quadtree.Insert(Planets[i]);
             SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Planets[i].Radius);
         }
     }

@@ -1,16 +1,23 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Specialized Quadtree only for resolving collisions in a Container.
+/// Principle behaviour is ResolveCollisions which executes one physics tick.
+/// </summary>
 public class Quadtree
 {
     private readonly int MaximumContents;
     private List<Container> Contents;
-    private float Margin;
+    private List<Container> ToRectify;
 
-    private float Top;
-    private float Bottom;
-    private float Left;
-    private float Right;
+    private readonly Container Owner;
+    private readonly bool NearBoundry;
+
+    private readonly float Top;
+    private readonly float Bottom;
+    private readonly float Left;
+    private readonly float Right;
     private float HorizontalMedian
     {
         get
@@ -26,21 +33,25 @@ public class Quadtree
         }
     }
 
+    private readonly Quadtree Parent;
     private Quadtree QuadOne;
     private Quadtree QuadTwo;
     private Quadtree QuadThree;
     private Quadtree QuadFour;
 
-    public Quadtree(int maximumContents, float margin, float top, float bottom, float left, float right)
+    public Quadtree(Container owner, float top, float bottom, float left, float right, Quadtree parent = null, int maximumContents = 5)
     {
         MaximumContents = maximumContents;
         Contents = new List<Container>();
-        Margin = margin;
+        ToRectify = new List<Container>();
 
+        Owner = owner;
         Top = top;
         Bottom = bottom;
         Left = left;
         Right = right;
+
+        NearBoundry = FarthestCorner() >= Owner.Radius;
     }
 
     public void Insert(Container container)
@@ -55,6 +66,7 @@ public class Quadtree
             else
             {
                 Contents.Add(container);
+                container.MyQuad = this;
             }
         }
         else if (QuadOne.Contains(container))
@@ -76,15 +88,16 @@ public class Quadtree
         else
         {
             Contents.Add(container);
+            container.MyQuad = this;
         }
     }
 
     private void Split()
     {
-        QuadOne = new Quadtree(MaximumContents, Margin, Top, VerticalMedian, HorizontalMedian, Right);
-        QuadTwo = new Quadtree(MaximumContents, Margin, Top, VerticalMedian, Left, HorizontalMedian);
-        QuadThree = new Quadtree(MaximumContents, Margin, VerticalMedian, Bottom, Left, HorizontalMedian);
-        QuadFour = new Quadtree(MaximumContents, Margin, VerticalMedian, Bottom, HorizontalMedian, Right);
+        QuadOne = new Quadtree(Owner, Top, VerticalMedian, HorizontalMedian, Right, this, MaximumContents);
+        QuadTwo = new Quadtree(Owner, Top, VerticalMedian, Left, HorizontalMedian, this, MaximumContents);
+        QuadThree = new Quadtree(Owner, VerticalMedian, Bottom, Left, HorizontalMedian, this, MaximumContents);
+        QuadFour = new Quadtree(Owner, VerticalMedian, Bottom, HorizontalMedian, Right, this, MaximumContents);
 
         List<Container> toInstert = Contents;
         Contents = new List<Container>();
@@ -94,15 +107,15 @@ public class Quadtree
         }
     }
 
-    private bool Contains(CircleRigidBody circle)
+    private bool Contains(Container container)
     {
-        return (circle.Top < Top
-            && circle.Bottom > Bottom
-            && circle.Left > Left
-            && circle.Right < Right);
+        return (container.Top < Top
+            && container.Bottom > Bottom
+            && container.Left > Left
+            && container.Right < Right);
     }
 
-    public float ResolveCollisions()
+    public float ResolveCollisions(bool bounded)
     {
         float maxOverlap = 0f;
         List<Container> allContents = GetAllContents();
@@ -112,18 +125,27 @@ public class Quadtree
             {
                 maxOverlap = Mathf.Max(maxOverlap, CheckCollision(container1, container2));
             }
+            if (NearBoundry && bounded)
+            {
+                maxOverlap = Mathf.Max(maxOverlap, CheckBoundry(container1));
+            }
         }
+        foreach (Container container in ToRectify)
+        {
+            Rectify(container);
+        }
+        ToRectify.Clear();
         if (QuadOne != null)
         {
-            maxOverlap = Mathf.Max(maxOverlap, QuadOne.ResolveCollisions());
-            maxOverlap = Mathf.Max(maxOverlap, QuadTwo.ResolveCollisions());
-            maxOverlap = Mathf.Max(maxOverlap, QuadThree.ResolveCollisions());
-            maxOverlap = Mathf.Max(maxOverlap, QuadFour.ResolveCollisions());
+            maxOverlap = Mathf.Max(maxOverlap, QuadOne.ResolveCollisions(bounded));
+            maxOverlap = Mathf.Max(maxOverlap, QuadTwo.ResolveCollisions(bounded));
+            maxOverlap = Mathf.Max(maxOverlap, QuadThree.ResolveCollisions(bounded));
+            maxOverlap = Mathf.Max(maxOverlap, QuadFour.ResolveCollisions(bounded));
         }
         return maxOverlap;
     }
     
-    private List<Container> GetAllContents()
+    public List<Container> GetAllContents()
     {
         List<Container> returnList = new List<Container>();
         returnList.AddRange(Contents);
@@ -147,7 +169,7 @@ public class Quadtree
         Vector2 relativePosition = container1.LocalPosition - container2.LocalPosition;
         float distance = relativePosition.magnitude;
         Vector2 direction = relativePosition / distance;
-        float minDistance = container1.Radius + container2.Radius + Margin;
+        float minDistance = container1.Radius + container2.Radius + Container.COLLISION_MARGIN;
         if (distance < minDistance)
         {
             float overlap = minDistance - distance;
@@ -155,6 +177,8 @@ public class Quadtree
             float container2Contribution = 1 - container1Contribution;
             container1.Push(direction * container1Contribution * overlap);
             container2.Push(-direction * container2Contribution * overlap);
+            ToRectify.Add(container1);
+            ToRectify.Add(container2);
             return overlap;
         }
         else
@@ -163,6 +187,52 @@ public class Quadtree
         }
     }
 
+    private float CheckBoundry(Container container)
+    {
+        float distance = Owner.Radius - container.LocalPosition.magnitude;
+        float minDistance = container.Radius + Container.COLLISION_MARGIN;
+        if (distance < minDistance)
+        {
+            float overlap = minDistance - distance;
+            float pushDistance = overlap;
+            container.Push(-container.LocalPosition.normalized * pushDistance);
+            ToRectify.Add(container);
+            return Mathf.Abs(overlap);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    /// <summary>
+    /// Check if a container is still within the same quad and if not move it
+    /// to the appropriate quad.
+    /// </summary>
+    /// <param name="container"></param>
+    private void Rectify(Container container)
+    {
+        if (!Contains(container) && Parent != null)
+        {
+            Parent.Rectify(container);
+        }
+        else if (container.MyQuad != this)
+        {
+            container.MyQuad.Remove(container);
+            Insert(container);
+        }
+    }
+
+    private void Remove(Container container)
+    {
+        Contents.Remove(container);
+    }
+
+    /// <summary>
+    /// Get a list of points which are endpoints of the lines neccesary to draw
+    /// this quadtree
+    /// </summary>
+    /// <returns></returns>
     public List<Vector2> GetLinePoints()
     {
         List<Vector2> returnList = new List<Vector2>();
@@ -182,5 +252,20 @@ public class Quadtree
             returnList.AddRange(QuadFour.GetLinePoints());
         }
         return returnList;
+    }
+
+    /// <summary>
+    /// The distance to the corner farthest from the center of the quadtree
+    /// owner.
+    /// </summary>
+    /// <returns></returns>
+    private float FarthestCorner()
+    {
+        return Mathf.Max(
+            (new Vector2(Top, Left)).magnitude,
+            (new Vector2(Top, Right)).magnitude,
+            (new Vector2(Bottom, Left)).magnitude,
+            (new Vector2(Bottom, Right)).magnitude
+            );
     }
 }
