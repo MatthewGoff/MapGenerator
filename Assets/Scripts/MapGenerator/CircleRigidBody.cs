@@ -1,53 +1,60 @@
 ﻿using UnityEngine;
 
-public abstract class CircleRigidBody
+namespace MapGenerator
 {
-    protected bool Immovable = false;
+    public abstract class CircleRigidBody
+    {
+        public Vector2 LocalPosition;
+        public Vector2 GlobalPosition { get; protected set; }
+        public float Radius;
+        public readonly float Mass;
+        public float Top
+        {
+            get
+            {
+                return LocalPosition.y + Radius;
+            }
+        }
+        public float Bottom
+        {
+            get
+            {
+                return LocalPosition.y - Radius;
+            }
+        }
+        public float Left
+        {
+            get
+            {
+                return LocalPosition.x - Radius;
+            }
+        }
+        public float Right
+        {
+            get
+            {
+                return LocalPosition.x + Radius;
+            }
+        }
 
-    public Vector2 LocalPosition;
-    public float Radius;
-    public float Mass { get; private set; }
-    public float Top
-    {
-        get
-        {
-            return LocalPosition.y + Radius;
-        }
-    }
-    public float Bottom
-    {
-        get
-        {
-            return LocalPosition.y - Radius;
-        }
-    }
-    public float Left
-    {
-        get
-        {
-            return LocalPosition.x - Radius;
-        }
-    }
-    public float Right
-    {
-        get
-        {
-            return LocalPosition.x + Radius;
-        }
-    }
+        public Quadtree MyQuad;
 
-    public CircleRigidBody(Vector2 localPosition, float radius)
-    {
-        LocalPosition = localPosition;
-        Radius = radius;
-        Mass = Mathf.Pow(Radius, 2);
-    }
+        protected readonly bool Immovable = false;
 
-    public void Push(Vector2 vector)
-    {
-        if (!Immovable)
+        public CircleRigidBody(Vector2 localPosition, float radius, bool immovable)
         {
-            LocalPosition += vector;
+            LocalPosition = localPosition;
+            Radius = radius;
+            Mass = Mathf.Pow(Radius, 2);
+            Immovable = immovable;
+        }
+
+        public void Push(Vector2 vector)
+        {
+            if (!Immovable)
+            {
+                LocalPosition += vector;
+            }
         }
     }
 }
