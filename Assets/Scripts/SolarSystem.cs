@@ -10,29 +10,26 @@ public class SolarSystem : Container
     private Planet[] Planets;
     private GameObject Backdrop;
 
-	public SolarSystem(Vector2 position)
+    public SolarSystem(Vector2 position) : base (position, 5f)
     {
-        LocalPosition = position;
-        Radius = 5f;
-
-        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
+        List<Container> containers = new List<Container>();
         Star = new Star(new Vector2(0, 0), true);
-        colliders.Add(Star);
+        containers.Add(Star);
 
-        CreatePlanets(Random.Range(MIN_PLANETS, MAX_PLANETS + 1), colliders);
+        CreatePlanets(Random.Range(MIN_PLANETS, MAX_PLANETS + 1), containers);
 
-        Distribute(colliders, false, false);
-        FinalizeRadius(colliders);
+        Distribute(containers, false, false);
+        FinalizeRadius(containers);
     }
 
-    private void CreatePlanets(int number, List<CircleRigidBody> colliders)
+    private void CreatePlanets(int number, List<Container> containers)
     {
         Planets = new Planet[number];
         for (int i = 0; i < Planets.Length; i++)
         {
             Vector2 localPosition = Random.insideUnitCircle * Radius;
             Planets[i] = new Planet(localPosition);
-            colliders.Add(Planets[i]);
+            containers.Add(Planets[i]);
             SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Planets[i].Radius);
         }
     }

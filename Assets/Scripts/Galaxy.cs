@@ -8,29 +8,26 @@ public class Galaxy : Container
 
     private GameObject Backdrop;
 
-    public Galaxy(Vector2 position)
+    public Galaxy(Vector2 localPosition) : base(localPosition, 1f)
     {
-        LocalPosition = position;
-        Radius = 1f;
+        List<Container> containers = new List<Container>();
+        CreateSectors(Random.Range(MIN_SECTORS, MAX_SECTORS + 1), containers);
 
-        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
-        CreateSectors(Random.Range(MIN_SECTORS, MAX_SECTORS + 1), colliders);
+        Distribute(containers, true, true);
 
-        Distribute(colliders, true, true);
+        CreateClouds(Sectors.Length * 2, containers);
 
-        CreateClouds(Sectors.Length * 2, colliders);
+        Distribute(containers, false, true);
 
-        Distribute(colliders, false, true);
+        CreateSolarSystems(Clouds.Length * 2, containers);
 
-        CreateSolarSystems(Clouds.Length * 2, colliders);
+        Distribute(containers, false, true);
 
-        Distribute(colliders, false, true);
+        CreateStars(SolarSystems.Length * 2, containers);
 
-        CreateStars(SolarSystems.Length * 2, colliders);
+        Distribute(containers, false, true);
 
-        Distribute(colliders, false, true);
-
-        FinalizeRadius(colliders);
+        FinalizeRadius(containers);
     }
 
     public void Realize(Vector2 parentPosition)

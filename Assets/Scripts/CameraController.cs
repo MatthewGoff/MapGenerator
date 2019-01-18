@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
@@ -19,5 +20,29 @@ public class CameraController : MonoBehaviour
         {
             GetComponent<Camera>().orthographicSize *= ZOOM_MULTIPLIER;
         }
+
+    }
+
+    private void OnPostRender()
+    {
+        if (GameManager.Instance.LastQuadtree != null)
+        {
+            //DrawQuadtree();
+        }
+    }
+
+    private void DrawQuadtree()
+    {
+        Material lineMat = new Material(Shader.Find("Sprites/Default"));
+        GL.Begin(GL.LINES);
+        lineMat.SetPass(0);
+        GL.Color(new Color(0f, 1f, 0f, 1f));
+
+        foreach (Vector2 point in GameManager.Instance.LastQuadtree.GetLinePoints())
+        {
+            GL.Vertex(point);
+        }
+
+        GL.End();
     }
 }

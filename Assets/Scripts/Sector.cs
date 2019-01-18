@@ -8,25 +8,22 @@ public class Sector : Container
 
     private GameObject Backdrop;
 
-    public Sector(Vector2 position)
+    public Sector(Vector2 localPosition) : base(localPosition, 1f)
     {
-        LocalPosition = position;
-        Radius = 1f;
+        List<Container> containers = new List<Container>();
+        CreateClouds(Random.Range(MIN_CLOUDS, MAX_CLOUDS + 1), containers);
 
-        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
-        CreateClouds(Random.Range(MIN_CLOUDS, MAX_CLOUDS + 1), colliders);
+        Distribute(containers, true, true);
 
-        Distribute(colliders, true, true);
+        CreateSolarSystems(Clouds.Length * 2, containers);
 
-        CreateSolarSystems(Clouds.Length * 2, colliders);
+        Distribute(containers, false, true);
 
-        Distribute(colliders, false, true);
+        CreateStars(SolarSystems.Length * 2, containers);
 
-        CreateStars(SolarSystems.Length * 2, colliders);
+        Distribute(containers, false, true);
 
-        Distribute(colliders, false, true);
-
-        FinalizeRadius(colliders);
+        FinalizeRadius(containers);
     }
 
     public void Realize(Vector2 parentPosition)

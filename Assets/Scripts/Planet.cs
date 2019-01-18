@@ -10,10 +10,9 @@ public class Planet : Container
     private GameObject GameObject;
     private int PPU;
 
-	public Planet(Vector2 position)
+	public Planet(Vector2 localPosition) : base(localPosition, Random.Range(0.5f, 2.0f))
     {
-        Radius = Random.Range(0.5f, 2.0f);
-        LocalPosition = position;
+
     }
 
     public void Realize(Vector2 parentPosition)
@@ -37,8 +36,8 @@ public class Planet : Container
     {
         if (GameManager.Instance.PlainRendering)
         {
-            PPU = 1024;
-            return (Texture2D)Resources.Load("Sprites/WhiteCircle");
+            PPU = 64;
+            return (Texture2D)Resources.Load("Sprites/WhiteCircle64x64");
         }
         else
         {

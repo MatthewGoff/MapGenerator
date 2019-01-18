@@ -2,15 +2,14 @@
 
 public class Star : Container
 {
-    public static readonly float MIN_RADIUS = 1f;
-    public static readonly float MAX_RADIUS = 4f;
+    public static readonly float MIN_RADIUS = 0.5f;
+    public static readonly float MAX_RADIUS = 2f;
 
     private GameObject GameObject;
+    private int PPU;
 
-    public Star(Vector2 position, bool immovable)
+    public Star(Vector2 localPosition, bool immovable) : base(localPosition, Random.Range(MIN_RADIUS, MAX_RADIUS))
     {
-        Radius = Random.Range(MIN_RADIUS, MAX_RADIUS);
-        LocalPosition = position;
         Immovable = immovable;
     }
 
@@ -21,9 +20,9 @@ public class Star : Container
         GameObject.transform.localScale = new Vector3(Radius * 2, Radius * 2, 1f);
 
         Texture2D texture = ChooseTexture();
-        Rect rect = new Rect(0, 0, 1024, 1024);
+        Rect rect = new Rect(0, 0, PPU, PPU);
         GameObject.AddComponent<SpriteRenderer>();
-        GameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, rect, new Vector2(0.5f, 0.5f), 1024);
+        GameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, rect, new Vector2(0.5f, 0.5f), PPU);
     }
 
     public void Destroy()
@@ -35,10 +34,12 @@ public class Star : Container
     {
         if (GameManager.Instance.PlainRendering)
         {
-            return (Texture2D)Resources.Load("Sprites/WhiteCircle");
+            PPU = 64;
+            return (Texture2D)Resources.Load("Sprites/WhiteCircle64x64");
         }
         else
         {
+            PPU = 1024;
             return CreateRandomTexture();
         }
     }

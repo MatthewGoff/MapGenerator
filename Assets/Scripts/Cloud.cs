@@ -8,21 +8,18 @@ public class Cloud : Container
 
     private GameObject Backdrop;
 
-    public Cloud(Vector2 position)
+    public Cloud(Vector2 localPosition) : base(localPosition, 1f)
     {
-        LocalPosition = position;
-        Radius = 1f;
+        List<Container> containers = new List<Container>();
+        CreateSolarSystems(Random.Range(MIN_SOLAR_SYSTEMS, MAX_SOLAR_SYSTEMS + 1), containers);
 
-        List<CircleRigidBody> colliders = new List<CircleRigidBody>();
-        CreateSolarSystems(Random.Range(MIN_SOLAR_SYSTEMS, MAX_SOLAR_SYSTEMS + 1), colliders);
+        Distribute(containers, true, true);
 
-        Distribute(colliders, true, true);
+        CreateStars(SolarSystems.Length * 2, containers);
 
-        CreateStars(SolarSystems.Length * 2, colliders);
-
-        Distribute(colliders, true, true);
+        Distribute(containers, true, true);
         
-        FinalizeRadius(colliders);
+        FinalizeRadius(containers);
     }
 
     public void Realize(Vector2 parentPosition)
