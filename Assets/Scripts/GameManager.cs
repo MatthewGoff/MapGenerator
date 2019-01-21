@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     public GameObject Camera;
     public GameObject Square;
 
+    private float TimeStamp;
+
     private void Awake()
     {
         Instance = this;
@@ -49,23 +51,21 @@ public class GameManager : MonoBehaviour
 
     private void CreateWorld()
     {
-        //Debug.Log("Number Of Logical Processors: " + System.Environment.ProcessorCount.ToString());
-
         System.Random rng = new System.Random();
         // int seed = 865259136;
         int seed = rng.Next();
         rng = new System.Random(seed);
         Debug.Log("Seed = " + seed);
 
-        float time = Time.realtimeSinceStartup;
-        MapGenerator.GenerateMap thread = new MapGenerator.GenerateMap(MapSize, rng.Next(), OnWorldGenerated);
+        TimeStamp = Time.realtimeSinceStartup;
+        MapGenerator.GenerateMap thread = new MapGenerator.GenerateMap(MapSize, rng.Next(), System.Environment.ProcessorCount - 2, OnWorldGenerated);
         thread.Start();
         StartCoroutine(WaitForMapGeneration(thread));
     }
 
     public IEnumerator WaitForMapGeneration(MapGenerator.GenerateMap thread)
     {
-        while(MapRenderer == null)
+        while(Map == null)
         {
             thread.Update();
             yield return null;
@@ -74,15 +74,13 @@ public class GameManager : MonoBehaviour
 
     private void OnWorldGenerated(MapGenerator.Containers.Container map)
     {
-        //Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
+        Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
-        //float time = Time.realtimeSinceStartup;
+        TimeStamp = Time.realtimeSinceStartup;
         CreateMap(map);
-        //Debug.Log("Transfer Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
+        Debug.Log("Transfer Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
-        //time = Time.realtimeSinceStartup;
         MapRenderer = new MapRenderer(Camera.GetComponent<Camera>().pixelWidth, Camera.GetComponent<Camera>().pixelHeight, Map);
-        //Debug.Log("Render Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
     }
 
     private void CreateMap(MapGenerator.Containers.Container map)

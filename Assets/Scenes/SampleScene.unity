@@ -347,7 +347,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawQuadtree: 1
-  MapSize: 5
+  MapSize: 4
   StarGradient:
     serializedVersion: 2
     key0: {r: 0.25, g: 0.25, b: 1, a: 1}

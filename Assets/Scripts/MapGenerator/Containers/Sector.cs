@@ -8,10 +8,10 @@ namespace MapGenerator.Containers
         private static readonly int MAX_CLOUDS = 9;
         public static readonly float MAX_RADIUS = Cloud.MAX_RADIUS * 4;
 
-        public Sector(Vector2 localPosition, int randomSeed, bool maximize = false) : base(CelestialBodyType.Sector, localPosition, 1f, randomSeed, MAX_RADIUS)
+        public Sector(Vector2 localPosition, int randomSeed, bool root) : base(CelestialBodyType.Sector, localPosition, 1f, randomSeed, MAX_RADIUS, root)
         {
             int population;
-            if (maximize)
+            if (root)
             {
                 population = MAX_CLOUDS;
             }

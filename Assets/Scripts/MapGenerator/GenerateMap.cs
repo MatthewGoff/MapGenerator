@@ -11,11 +11,20 @@ namespace MapGenerator
         private readonly Callback FinishedCallback;
         private Containers.Container Map;
 
-        public GenerateMap(CelestialBodyType celestialBodyType, int seed, Callback callback)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapSize"></param>
+        /// <param name="seed"></param>
+        /// <param name="maxThreads">Minimum of 2 threads required</param>
+        /// <param name="callback"></param>
+        public GenerateMap(CelestialBodyType mapSize, int seed, int maxThreads, Callback callback)
         {
-            MapSize = celestialBodyType;
+            MapSize = mapSize;
             MapSeed = seed;
             FinishedCallback = callback;
+            maxThreads = Mathf.Min(2, maxThreads);
+            ThreadManager.Initialize(maxThreads - 1);
         }
 
         protected override void ThreadFunction()
@@ -48,7 +57,10 @@ namespace MapGenerator
             {
                 Map = new Containers.SolarSystem(new Vector2(0f, 0f), MapSeed, true);
             }
-            Map.CalculateGlobalPositions(new Vector2(0f, 0f));
+            while (!Map.Initialized)
+            {
+                ThreadManager.Instance.Update();
+            }
         }
 
         protected override void OnFinished()
