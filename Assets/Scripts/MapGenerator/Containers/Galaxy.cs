@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_SECTORS = 9;
         public static readonly float MAX_RADIUS = Sector.MAX_RADIUS * 4;
 
-        public Galaxy(Vector2 localPosition, bool maximize = false) : base(localPosition, 1f, MAX_RADIUS)
+        public Galaxy(Vector2 localPosition, int randomSeed, bool maximize = false) : base(CelestialBodyType.Galaxy, localPosition, 1f, randomSeed, MAX_RADIUS)
         {
             int population;
             if (maximize)
@@ -17,7 +17,7 @@ namespace MapGenerator.Containers
             }
             else
             {
-                population = Random.Range(MIN_SECTORS, MAX_SECTORS + 1);
+                population = RNG.Next(MIN_SECTORS, MAX_SECTORS + 1);
             }
             CreateSectors(population);
             Distribute(true, true);

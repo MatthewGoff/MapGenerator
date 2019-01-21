@@ -5,9 +5,12 @@ namespace CelestialBodies
 {
     public abstract class CelestialBody
     {
+        public readonly CelestialBodyType Type;
         public readonly Vector2 Position;
         public readonly float Radius;
 
+        public readonly Expanse[] Expanses;
+        public readonly Group[] Groups;
         public readonly Galaxy[] Galaxies;
         public readonly Sector[] Sectors;
         public readonly Cloud[] Clouds;
@@ -17,9 +20,10 @@ namespace CelestialBodies
 
         protected CelestialBody(MapGenerator.Containers.Container container)
         {
+            Type = container.Type;
             Position = container.GlobalPosition;
             Radius = container.Radius;
-
+            
             if (container.Galaxies != null)
             {
                 Galaxies = new Galaxy[container.Galaxies.Length];
@@ -70,9 +74,123 @@ namespace CelestialBodies
             }
         }
 
+        public List<CelestialBody> GetAllContents()
+        {
+            List<CelestialBody> list = new List<CelestialBody>
+            {
+                this
+            };
+
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    list.AddRange(Expanses[i].GetAllContents());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    list.AddRange(Groups[i].GetAllContents());
+                }
+            }
+            if (Galaxies != null)
+            {
+                for (int i = 0; i < Galaxies.Length; i++)
+                {
+                    list.AddRange(Galaxies[i].GetAllContents());
+                }
+            }
+            if (Sectors != null)
+            {
+                for (int i = 0; i < Sectors.Length; i++)
+                {
+                    list.AddRange(Sectors[i].GetAllContents());
+                }
+            }
+            if (Clouds != null)
+            {
+                for (int i = 0; i < Clouds.Length; i++)
+                {
+                    list.AddRange(Clouds[i].GetAllContents());
+                }
+            }
+            if (SolarSystems != null)
+            {
+                for (int i = 0; i < SolarSystems.Length; i++)
+                {
+                    list.AddRange(SolarSystems[i].GetAllContents());
+                }
+            }
+            if (Stars != null)
+            {
+                for (int i = 0; i < Stars.Length; i++)
+                {
+                    list.Add(Stars[i]);
+                }
+            }
+            if (Planets != null)
+            {
+                for (int i = 0; i < Planets.Length; i++)
+                {
+                    list.Add(Planets[i]);
+                }
+            }
+
+            return list;
+        }
+
+        public List<Expanse> GetAllExpanses()
+        {
+            List<Expanse> expanses = new List<Expanse>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    expanses.AddRange(Expanses[i].GetAllExpanses());
+                }
+            }
+            return expanses;
+        }
+
+        public List<Group> GetAllGroups()
+        {
+            List<Group> groups = new List<Group>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    groups.AddRange(Expanses[i].GetAllGroups());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    groups.AddRange(Groups[i].GetAllGroups());
+                }
+            }
+            return groups;
+        }
+
         public List<Galaxy> GetAllGalaxies()
         {
             List<Galaxy> galaxies = new List<Galaxy>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    galaxies.AddRange(Expanses[i].GetAllGalaxies());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    galaxies.AddRange(Groups[i].GetAllGalaxies());
+                }
+            }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
@@ -86,6 +204,20 @@ namespace CelestialBodies
         public List<Sector> GetAllSectors()
         {
             List<Sector> sectors = new List<Sector>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    sectors.AddRange(Expanses[i].GetAllSectors());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    sectors.AddRange(Groups[i].GetAllSectors());
+                }
+            }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
@@ -106,6 +238,20 @@ namespace CelestialBodies
         public List<Cloud> GetAllClouds()
         {
             List<Cloud> clouds = new List<Cloud>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    clouds.AddRange(Expanses[i].GetAllClouds());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    clouds.AddRange(Groups[i].GetAllClouds());
+                }
+            }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
@@ -133,6 +279,20 @@ namespace CelestialBodies
         public List<SolarSystem> GetAllSolarSystems()
         {
             List<SolarSystem> solarSystems = new List<SolarSystem>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    solarSystems.AddRange(Expanses[i].GetAllSolarSystems());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    solarSystems.AddRange(Groups[i].GetAllSolarSystems());
+                }
+            }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
@@ -167,6 +327,20 @@ namespace CelestialBodies
         public List<Star> GetAllStars()
         {
             List<Star> stars = new List<Star>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    stars.AddRange(Expanses[i].GetAllStars());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    stars.AddRange(Groups[i].GetAllStars());
+                }
+            }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
@@ -208,6 +382,20 @@ namespace CelestialBodies
         public List<Planet> GetAllPlanets()
         {
             List<Planet> planets = new List<Planet>();
+            if (Expanses != null)
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    planets.AddRange(Expanses[i].GetAllPlanets());
+                }
+            }
+            if (Groups != null)
+            {
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    planets.AddRange(Groups[i].GetAllPlanets());
+                }
+            }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)

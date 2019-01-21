@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using CelestialBodies;
+using System.Collections.Generic;
 using UnityEngine;
-using CelestialBodies;
 
 namespace Map
 {
     public class MapManager : MonoBehaviour
     {
-
+        private UniverseRenderer[] UniverseRenderers;
+        private ExpanseRenderer[] ExpanseRenderers;
+        private GroupRenderer[] GroupRenderers;
         private GalaxyRenderer[] GalaxyRenderers;
         private SectorRenderer[] SectorRenderers;
         private CloudRenderer[] CloudRenderers;
@@ -14,11 +16,32 @@ namespace Map
         private StarRenderer[] StarRenderers;
         private PlanetRenderer[] PlanetRenderers;
 
+        private bool Initialized = false;
+
         public void Initialize()
         {
             CelestialBody celestialBody = GameManager.Instance.Map;
             CelestialBodyType mapSize = GameManager.Instance.MapSize;
-            if (mapSize == CelestialBodyType.Galaxy)
+            CreateGalaxyRenderers(celestialBody);
+            CreateSectorRenderers(celestialBody);
+            CreateCloudRenderers(celestialBody);
+            CreateSolarSystemRenderers(celestialBody);
+            CreateStarRenderers(celestialBody);
+            CreatePlanetRenderers(celestialBody);
+
+            if (mapSize == CelestialBodyType.Universe)
+            {
+                UniverseRenderers = new UniverseRenderer[] { new UniverseRenderer((Universe)celestialBody) };
+            }
+            else if (mapSize == CelestialBodyType.Expanse)
+            {
+                ExpanseRenderers = new ExpanseRenderer[] { new ExpanseRenderer((Expanse)celestialBody) };
+            }
+            else if (mapSize == CelestialBodyType.Group)
+            {
+                GroupRenderers = new GroupRenderer[] { new GroupRenderer((Group)celestialBody) };
+            }
+            else if (mapSize == CelestialBodyType.Galaxy)
             {
                 GalaxyRenderers = new GalaxyRenderer[] { new GalaxyRenderer((Galaxy)celestialBody) };
             }
@@ -34,12 +57,28 @@ namespace Map
             {
                 SolarSystemRenderers = new SolarSystemRenderer[] { new SolarSystemRenderer((SolarSystem)celestialBody) };
             }
-            CreateGalaxyRenderers(celestialBody);
-            CreateSectorRenderers(celestialBody);
-            CreateCloudRenderers(celestialBody);
-            CreateSolarSystemRenderers(celestialBody);
-            CreateStarRenderers(celestialBody);
-            CreatePlanetRenderers(celestialBody);
+
+            Initialized = true;
+        }
+
+        private void CreateExpanseRenderers(CelestialBody celestialBody)
+        {
+            List<Expanse> expanses = celestialBody.GetAllExpanses();
+            ExpanseRenderers = new ExpanseRenderer[expanses.Count];
+            for (int i = 0; i < ExpanseRenderers.Length; i++)
+            {
+                ExpanseRenderers[i] = new ExpanseRenderer(expanses[i]);
+            }
+        }
+
+        private void CreateGroupRenderers(CelestialBody celestialBody)
+        {
+            List<Group> groups = celestialBody.GetAllGroups();
+            GroupRenderers = new GroupRenderer[groups.Count];
+            for (int i = 0; i < GroupRenderers.Length; i++)
+            {
+                GroupRenderers[i] = new GroupRenderer(groups[i]);
+            }
         }
 
         private void CreateGalaxyRenderers(CelestialBody celestialBody)
@@ -104,9 +143,21 @@ namespace Map
 
         private void Update()
         {
-            for (int i = 0; i < GalaxyRenderers.Length; i++)
+            if (!Initialized)
             {
-                //GalaxyRenderers[i].Update();
+                return;
+            }
+            for (int i = 0; i < SolarSystemRenderers.Length; i++)
+            {
+                //SolarSystemRenderers[i].Update();
+            }
+            for (int i = 0; i < StarRenderers.Length; i++)
+            {
+                //StarRenderers[i].Update();
+            }
+            for (int i = 0; i < PlanetRenderers.Length; i++)
+            {
+                //PlanetRenderers[i].Update();
             }
         }
     }

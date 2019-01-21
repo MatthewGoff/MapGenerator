@@ -11,11 +11,11 @@ namespace Map
         {
             Data = data;
 
-            GameObject prefab = (GameObject)Resources.Load("Prefabs/WhiteCircle1024x1024");
+            GameObject prefab = (GameObject)Resources.Load("Prefabs/WhiteCircle512x512");
             Backdrop = GameObject.Instantiate(prefab, Data.Position, Quaternion.identity);
             Backdrop.transform.localScale = new Vector3(Data.Radius * 2f, Data.Radius * 2f, 1f);
             Backdrop.GetComponent<SpriteRenderer>().sortingOrder = -2;
-            Backdrop.GetComponent<SpriteRenderer>().color = new Color(0.4f, 0.4f, 0.4f);
+            Backdrop.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
         }
 
         public void Destroy()

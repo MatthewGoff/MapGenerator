@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_GALAXIES = 9;
         public static readonly float MAX_RADIUS = Galaxy.MAX_RADIUS * 4;
 
-        public Group(Vector2 localPosition, bool maximize = false) : base(localPosition, 1f, MAX_RADIUS)
+        public Group(Vector2 localPosition, int randomSeed, bool maximize = false) : base(CelestialBodyType.Group, localPosition, 1f, randomSeed, MAX_RADIUS)
         {
             int population;
             if (maximize)
@@ -17,7 +17,7 @@ namespace MapGenerator.Containers
             }
             else
             {
-                population = Random.Range(MIN_GALAXIES, MAX_GALAXIES + 1);
+                population = RNG.Next(MIN_GALAXIES, MAX_GALAXIES + 1);
             }
             CreateGalaxies(population);
             Distribute(true, true);

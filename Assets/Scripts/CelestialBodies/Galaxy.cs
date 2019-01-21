@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace CelestialBodies
+﻿namespace CelestialBodies
 {
     public class Galaxy : CelestialBody
     {

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -6,53 +6,130 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public readonly bool PlainRendering = true;
+    public bool DrawQuadtree = true;
 
-    public CelestialBodies.CelestialBodyType MapSize = CelestialBodies.CelestialBodyType.SolarSystem;
+    public CelestialBodyType MapSize = CelestialBodyType.SolarSystem;
     public CelestialBodies.CelestialBody Map;
 
     public Gradient StarGradient;
-    public MapGenerator.Quadtree LastQuadtree;
-    public GameObject MapManager;
+    public Quadtree Quadtree;
+    public MapRenderer MapRenderer;
+    public GameObject Camera;
+    public GameObject Square;
 
     private void Awake()
     {
         Instance = this;
 
+        //CreateBoxes();
+        CreateWorld();
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            DrawQuadtree = !DrawQuadtree;
+        }
+        // Debug.Log(1f/Time.deltaTime);
+    }
+
+    private void CreateBoxes()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            int x = i * 4096;
+            for (int j = 0; j < 8; j++)
+            {
+                int y = j * 4096;
+                Instantiate(Square, new Vector2(x, y), Quaternion.identity);
+            }
+        }
+    }
+
+    private void CreateWorld()
+    {
+        //Debug.Log("Number Of Logical Processors: " + System.Environment.ProcessorCount.ToString());
+
+        System.Random rng = new System.Random();
         // int seed = 865259136;
-        int seed = (int)(Random.value * int.MaxValue);
-        Random.InitState(seed);
+        int seed = rng.Next();
+        rng = new System.Random(seed);
         Debug.Log("Seed = " + seed);
 
         float time = Time.realtimeSinceStartup;
-        MapGenerator.Containers.Container map = MapGenerator.MapGenerator.GenerateMap(MapSize);
-        Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
+        MapGenerator.GenerateMap thread = new MapGenerator.GenerateMap(MapSize, rng.Next(), OnWorldGenerated);
+        thread.Start();
+        StartCoroutine(WaitForMapGeneration(thread));
+    }
 
-        time = Time.realtimeSinceStartup;
+    public IEnumerator WaitForMapGeneration(MapGenerator.GenerateMap thread)
+    {
+        while(MapRenderer == null)
+        {
+            thread.Update();
+            yield return null;
+        }
+    }
+
+    private void OnWorldGenerated(MapGenerator.Containers.Container map)
+    {
+        //Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
+
+        //float time = Time.realtimeSinceStartup;
         CreateMap(map);
-        Debug.Log("Transfer Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
+        //Debug.Log("Transfer Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
 
-        time = Time.realtimeSinceStartup;
-        MapManager.GetComponent<Map.MapManager>().Initialize();
-        Debug.Log("Render Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
+        //time = Time.realtimeSinceStartup;
+        MapRenderer = new MapRenderer(Camera.GetComponent<Camera>().pixelWidth, Camera.GetComponent<Camera>().pixelHeight, Map);
+        //Debug.Log("Render Duration = " + (Time.realtimeSinceStartup - time) + " seconds");
     }
 
     private void CreateMap(MapGenerator.Containers.Container map)
     {
-        if (MapSize == CelestialBodies.CelestialBodyType.Galaxy)
+        if (MapSize == CelestialBodyType.Universe)
+        {
+            Map = new CelestialBodies.Universe((MapGenerator.Containers.Universe)map);
+        }
+        else if (MapSize == CelestialBodyType.Expanse)
+        {
+            Map = new CelestialBodies.Expanse((MapGenerator.Containers.Expanse)map);
+        }
+        else if (MapSize == CelestialBodyType.Group)
+        {
+            Map = new CelestialBodies.Group((MapGenerator.Containers.Group)map);
+        }
+        else if (MapSize == CelestialBodyType.Galaxy)
         {
             Map = new CelestialBodies.Galaxy((MapGenerator.Containers.Galaxy)map);
         }
-        if (MapSize == CelestialBodies.CelestialBodyType.Sector)
+        else if (MapSize == CelestialBodyType.Sector)
         {
             Map = new CelestialBodies.Sector((MapGenerator.Containers.Sector)map);
         }
-        if (MapSize == CelestialBodies.CelestialBodyType.Cloud)
+        else if (MapSize == CelestialBodyType.Cloud)
         {
             Map = new CelestialBodies.Cloud((MapGenerator.Containers.Cloud)map);
         }
-        if (MapSize == CelestialBodies.CelestialBodyType.SolarSystem)
+        else if (MapSize == CelestialBodyType.SolarSystem)
         {
             Map = new CelestialBodies.SolarSystem((MapGenerator.Containers.SolarSystem)map);
         }
+    }
+    
+    public Rect GetCameraRect()
+    {
+        Camera camera = Camera.GetComponent<Camera>();
+        float height = camera.orthographicSize * 2;
+        float width = height * camera.aspect;
+        Vector2 size = new Vector2(width, height);
+        Vector2 position = (Vector2) camera.transform.position - size / 2f;
+        return new Rect(position, size);
+    }
+
+    public float GetCameraResolution()
+    {
+        Camera camera = Camera.GetComponent<Camera>();
+        return camera.pixelHeight / (camera.orthographicSize * 2f);
     }
 }

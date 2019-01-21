@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_CLOUDS = 9;
         public static readonly float MAX_RADIUS = Cloud.MAX_RADIUS * 4;
 
-        public Sector(Vector2 localPosition, bool maximize = false) : base(localPosition, 1f, MAX_RADIUS)
+        public Sector(Vector2 localPosition, int randomSeed, bool maximize = false) : base(CelestialBodyType.Sector, localPosition, 1f, randomSeed, MAX_RADIUS)
         {
             int population;
             if (maximize)
@@ -17,7 +17,7 @@ namespace MapGenerator.Containers
             }
             else
             {
-                population = Random.Range(MIN_CLOUDS, MAX_CLOUDS + 1);
+                population = RNG.Next(MIN_CLOUDS, MAX_CLOUDS + 1);
             }
             CreateClouds(population);
             Distribute(true, true);

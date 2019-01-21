@@ -7,22 +7,55 @@ namespace Map
         private static readonly float MIN_TEXTURE_FREQUENCY = 0.001f;
         private static readonly float MAX_TEXTURE_FREQUENCY = 0.02f;
         private static readonly int TEXTURE_SIZE = 64;
+        private static readonly float MIN_CAMERA_PPU = 2;
 
         private readonly CelestialBodies.Planet Data;
+        private readonly Texture2D Texture;
         private GameObject GameObject;
+        private Rect Rect
+        {
+            get
+            {
+                Vector2 size = new Vector2(Data.Radius * 2f, Data.Radius * 2f);
+                Vector2 position = Data.Position - size / 2;
+                return new Rect(position, size);
+            }
+        }
 
         public PlanetRenderer(CelestialBodies.Planet data)
         {
             Data = data;
+            Texture = ChooseTexture();
+        }
 
+        public void Update()
+        {
+            if (Visible() && GameObject == null)
+            {
+                CreateGameObject();
+            }
+            else if (!Visible() && GameObject != null)
+            {
+                GameObject.Destroy(GameObject);
+            }
+        }
+
+        private void CreateGameObject()
+        {
             GameObject = new GameObject("Planet");
             GameObject.transform.position = Data.Position;
             GameObject.transform.localScale = new Vector3(Data.Radius * 2f, Data.Radius * 2f, 1f);
 
-            Texture2D texture = ChooseTexture();
             Rect rect = new Rect(0, 0, TEXTURE_SIZE, TEXTURE_SIZE);
             GameObject.AddComponent<SpriteRenderer>();
-            GameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, rect, new Vector2(0.5f, 0.5f), TEXTURE_SIZE);
+            GameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(Texture, rect, new Vector2(0.5f, 0.5f), TEXTURE_SIZE);
+            GameObject.GetComponent<SpriteRenderer>().sortingOrder = 0;
+        }
+
+        private bool Visible()
+        {
+            return GameManager.Instance.GetCameraRect().Overlaps(Rect)
+                && GameManager.Instance.GetCameraResolution() > MIN_CAMERA_PPU;
         }
 
         public void Destroy()
