@@ -17,26 +17,13 @@ public class GameManager : MonoBehaviour
     public GameObject Camera;
     public GameObject MapGenScreen;
 
-    public GameObject marker;
-
     private float TimeStamp;
 
     private void Awake()
     {
         Instance = this;
 
-        //CreateBoxes();
         CreateWorld();
-        //RandomTest();
-    }
-
-    private void RandomTest()
-    {
-        System.Random rng = new System.Random();
-        for (int i = 0; i < 100; i++)
-        {
-            Instantiate(marker, Helpers.InsideUnitCircle(rng) * 10f, Quaternion.identity);
-        }
     }
 
     public void Update()
@@ -45,14 +32,18 @@ public class GameManager : MonoBehaviour
         {
             DrawQuadtree = !DrawQuadtree;
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            MapGenScreen.SetActive(!MapGenScreen.activeSelf);
+        }
         // Debug.Log(1f/Time.deltaTime);
     }
 
     private void CreateWorld()
     {
         System.Random rng = new System.Random();
-        int seed = 547291039;
-        // int seed = rng.Next();
+        // int seed = 547291039;
+        int seed = rng.Next();
         rng = new System.Random(seed);
         Debug.Log("Seed = " + seed);
 
@@ -79,7 +70,6 @@ public class GameManager : MonoBehaviour
         CreateMap(map);
 
         MapRenderer = new MapRenderer(Camera.GetComponent<Camera>().pixelWidth, Camera.GetComponent<Camera>().pixelHeight, Map);
-        MapGenScreen.SetActive(false);
     }
 
     private void CreateMap(MapGenerator.Containers.Container map)

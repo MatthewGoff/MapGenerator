@@ -4,8 +4,8 @@ namespace MapGenerator.Containers
 {
     public class Sector : Container
     {
-        private static readonly int MIN_SOLAR_SYSTEMS = 3;
-        private static readonly int MAX_SOLAR_SYSTEMS = 9;
+        private static readonly int MIN_SOLAR_SYSTEMS = 4;
+        private static readonly int MAX_SOLAR_SYSTEMS = 20;
         public static readonly float MAX_RADIUS = SolarSystem.MAX_RADIUS * 4;
 
         public Sector(int randomSeed, bool root) : base(CelestialBodyType.Sector, 1f, randomSeed, MAX_RADIUS, root)

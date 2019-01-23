@@ -180,7 +180,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Galaxies:'
+  m_Text: 'Expanses:'
 --- !u!222 &58105620
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -197,7 +197,7 @@ GameObject:
   m_Component:
   - component: {fileID: 123059543}
   m_Layer: 5
-  m_Name: Galaxies
+  m_Name: Expanses
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -318,7 +318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &178084775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,17 +412,17 @@ MonoBehaviour:
   TotalPlanets: {fileID: 1257088463}
   TotalStars: {fileID: 1648251486}
   TotalSolarSystems: {fileID: 1514399056}
-  TotalClouds: {fileID: 479054112}
-  TotalSectors: {fileID: 1730746274}
-  TotalGalaxies: {fileID: 1401611692}
-  TotalGroups: {fileID: 574893279}
+  TotalSectors: {fileID: 479054112}
+  TotalGalaxies: {fileID: 1730746274}
+  TotalExpanses: {fileID: 1401611692}
+  TotalUniverses: {fileID: 574893279}
   CurrentPlanets: {fileID: 2030870282}
   CurrentStars: {fileID: 1461038767}
   CurrentSolarSystems: {fileID: 1198115736}
-  CurrentClouds: {fileID: 457794762}
-  CurrentSectors: {fileID: 1150050194}
-  CurrentGalaxies: {fileID: 164871022}
-  CurrentGroups: {fileID: 649026183}
+  CurrentSectors: {fileID: 457794762}
+  CurrentGalaxies: {fileID: 1150050194}
+  CurrentExpanses: {fileID: 164871022}
+  CurrentUniverses: {fileID: 649026183}
   CurrentActivity: {fileID: 1833044817}
 --- !u!1 &184333798
 GameObject:
@@ -1313,7 +1313,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1003918292}
   m_Layer: 5
-  m_Name: Clouds
+  m_Name: Sectors
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1412,7 +1412,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1101167423}
   m_Layer: 5
-  m_Name: Sectors
+  m_Name: Galaxies
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1599,7 +1599,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1161425616}
   m_Layer: 5
-  m_Name: Groups
+  m_Name: Universes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1694,7 +1694,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Groups:'
+  m_Text: 'Universes:'
 --- !u!222 &1184369690
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1994,7 +1994,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Clouds:'
+  m_Text: 'Sectors:'
 --- !u!222 &1231062809
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2930,7 +2930,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Sectors:'
+  m_Text: 'Galaxies:'
 --- !u!222 &1847190875
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -69,6 +69,7 @@ namespace MapGenerator
             }
             ProgressTracker.Instance.PopActivity();
             ProgressTracker.Instance.PopActivity();
+            ProgressTracker.Instance.PopActivity();
         }
 
         protected override void OnFinished()

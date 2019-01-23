@@ -4,8 +4,8 @@ namespace MapGenerator.Containers
 {
     public class Universe : Container
     {
-        private static readonly int MIN_EXPANSES = 3;
-        private static readonly int MAX_EXPANSES = 9;
+        private static readonly int MIN_EXPANSES = 4;
+        private static readonly int MAX_EXPANSES = 20;
         public static readonly float MAX_RADIUS = Expanse.MAX_RADIUS * 4;
 
         public Universe(int randomSeed, bool root) : base(CelestialBodyType.Universe, 1f, randomSeed, MAX_RADIUS, root)
