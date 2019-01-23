@@ -64,25 +64,6 @@ namespace MapGenerator
                 }
             }
         }
-        public int TotalClouds
-        {
-            get
-            {
-                int tmp;
-                lock (AccessToTotalClouds)
-                {
-                    tmp = m_TotalClouds;
-                }
-                return tmp;
-            }
-            set
-            {
-                lock (AccessToTotalClouds)
-                {
-                    m_TotalClouds = value;
-                }
-            }
-        }
         public int TotalSectors
         {
             get
@@ -118,25 +99,6 @@ namespace MapGenerator
                 lock (AccessToTotalGalaxies)
                 {
                     m_TotalGalaxies = value;
-                }
-            }
-        }
-        public int TotalGroups
-        {
-            get
-            {
-                int tmp;
-                lock (AccessToTotalGroups)
-                {
-                    tmp = m_TotalGroups;
-                }
-                return tmp;
-            }
-            set
-            {
-                lock (AccessToTotalGroups)
-                {
-                    m_TotalGroups = value;
                 }
             }
         }
@@ -178,7 +140,6 @@ namespace MapGenerator
                 }
             }
         }
-
         public int PlanetsInitialized
         {
             get
@@ -236,25 +197,6 @@ namespace MapGenerator
                 }
             }
         }
-        public int CloudsInitialized
-        {
-            get
-            {
-                int tmp;
-                lock (AccessToCloudsInitialized)
-                {
-                    tmp = m_CloudsInitialized;
-                }
-                return tmp;
-            }
-            set
-            {
-                lock (AccessToCloudsInitialized)
-                {
-                    m_CloudsInitialized = value;
-                }
-            }
-        }
         public int SectorsInitialized
         {
             get
@@ -290,25 +232,6 @@ namespace MapGenerator
                 lock (AccessToGalaxiesInitialized)
                 {
                     m_GalaxiesInitialized = value;
-                }
-            }
-        }
-        public int GroupsInitialized
-        {
-            get
-            {
-                int tmp;
-                lock (AccessToGroupsInitialized)
-                {
-                    tmp = m_GroupsInitialized;
-                }
-                return tmp;
-            }
-            set
-            {
-                lock (AccessToGroupsInitialized)
-                {
-                    m_GroupsInitialized = value;
                 }
             }
         }
@@ -354,40 +277,32 @@ namespace MapGenerator
         private readonly object AccessToTotalPlanets;
         private readonly object AccessToTotalStars;
         private readonly object AccessToTotalSolarSystems;
-        private readonly object AccessToTotalClouds;
         private readonly object AccessToTotalSectors;
         private readonly object AccessToTotalGalaxies;
-        private readonly object AccessToTotalGroups;
         private readonly object AccessToTotalExpanses;
         private readonly object AccessToTotalUniverses;
 
         private readonly object AccessToPlanetsInitialized;
         private readonly object AccessToStarsInitialized;
         private readonly object AccessToSolarSystemsInitialized;
-        private readonly object AccessToCloudsInitialized;
         private readonly object AccessToSectorsInitialized;
         private readonly object AccessToGalaxiesInitialized;
-        private readonly object AccessToGroupsInitialized;
         private readonly object AccessToExpansesInitialized;
         private readonly object AccessToUniversesInitialized;
 
         private int m_TotalPlanets;
         private int m_TotalStars;
         private int m_TotalSolarSystems;
-        private int m_TotalClouds;
         private int m_TotalSectors;
         private int m_TotalGalaxies;
-        private int m_TotalGroups;
         private int m_TotalExpanses;
         private int m_TotalUniverses;
 
         private int m_PlanetsInitialized;
         private int m_StarsInitialized;
         private int m_SolarSystemsInitialized;
-        private int m_CloudsInitialized;
         private int m_SectorsInitialized;
         private int m_GalaxiesInitialized;
-        private int m_GroupsInitialized;
         private int m_ExpansesInitialized;
         private int m_UniversesInitialized;
 
@@ -407,20 +322,16 @@ namespace MapGenerator
             AccessToTotalPlanets = new object();
             AccessToTotalStars = new object();
             AccessToTotalSolarSystems = new object();
-            AccessToTotalClouds = new object();
             AccessToTotalSectors = new object();
             AccessToTotalGalaxies = new object();
-            AccessToTotalGroups = new object();
             AccessToTotalExpanses = new object();
             AccessToTotalUniverses = new object();
 
             AccessToPlanetsInitialized = new object();
             AccessToStarsInitialized = new object();
             AccessToSolarSystemsInitialized = new object();
-            AccessToCloudsInitialized = new object();
             AccessToSectorsInitialized = new object();
             AccessToGalaxiesInitialized = new object();
-            AccessToGroupsInitialized = new object();
             AccessToExpansesInitialized = new object();
             AccessToUniversesInitialized = new object();
         }

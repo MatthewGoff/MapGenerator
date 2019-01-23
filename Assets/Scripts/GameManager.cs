@@ -74,12 +74,9 @@ public class GameManager : MonoBehaviour
 
     private void OnWorldGenerated(MapGenerator.Containers.Container map)
     {
-        Debug.Log(map.Radius);
         Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
-        TimeStamp = Time.realtimeSinceStartup;
         CreateMap(map);
-        Debug.Log("Transfer Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
         MapRenderer = new MapRenderer(Camera.GetComponent<Camera>().pixelWidth, Camera.GetComponent<Camera>().pixelHeight, Map);
         MapGenScreen.SetActive(false);
@@ -95,10 +92,6 @@ public class GameManager : MonoBehaviour
         {
             Map = new CelestialBodies.Expanse((MapGenerator.Containers.Expanse)map);
         }
-        else if (MapSize == CelestialBodyType.Group)
-        {
-            Map = new CelestialBodies.Group((MapGenerator.Containers.Group)map);
-        }
         else if (MapSize == CelestialBodyType.Galaxy)
         {
             Map = new CelestialBodies.Galaxy((MapGenerator.Containers.Galaxy)map);
@@ -106,10 +99,6 @@ public class GameManager : MonoBehaviour
         else if (MapSize == CelestialBodyType.Sector)
         {
             Map = new CelestialBodies.Sector((MapGenerator.Containers.Sector)map);
-        }
-        else if (MapSize == CelestialBodyType.Cloud)
-        {
-            Map = new CelestialBodies.Cloud((MapGenerator.Containers.Cloud)map);
         }
         else if (MapSize == CelestialBodyType.SolarSystem)
         {

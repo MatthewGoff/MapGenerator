@@ -39,10 +39,6 @@ namespace MapGenerator
             {
                 Map = new Containers.Expanse(seed, true);
             }
-            else if (size == CelestialBodyType.Group)
-            {
-                Map = new Containers.Group(seed, true);
-            }
             else if (size == CelestialBodyType.Galaxy)
             {
                 Map = new Containers.Galaxy(seed, true);
@@ -50,10 +46,6 @@ namespace MapGenerator
             else if (size == CelestialBodyType.Sector)
             {
                 Map = new Containers.Sector(seed, true);
-            }
-            else if (size == CelestialBodyType.Cloud)
-            {
-                Map = new Containers.Cloud(seed, true);
             }
             else
             {

@@ -1,4 +1,6 @@
-﻿namespace CelestialBodies
+﻿using UnityEngine;
+
+namespace CelestialBodies
 {
     public class Sector : CelestialBody
     {

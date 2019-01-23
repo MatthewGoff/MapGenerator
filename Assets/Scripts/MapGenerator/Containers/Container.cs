@@ -15,10 +15,8 @@ namespace MapGenerator.Containers
         public delegate void Callback();
 
         public Expanse[] Expanses { get; protected set; }
-        public Group[] Groups { get; protected set; }
         public Galaxy[] Galaxies { get; protected set; }
         public Sector[] Sectors { get; protected set; }
-        public Cloud[] Clouds { get; protected set; }
         public SolarSystem[] SolarSystems { get; protected set; }
         public Star[] Stars { get; protected set; }
         public Planet[] Planets { get; protected set; }
@@ -49,8 +47,6 @@ namespace MapGenerator.Containers
         protected System.Random RNG;
 
         private readonly bool Root;
-        private Callback GroupsInitializedCallback;
-        private Callback ExpansesInitializedCallback;
         private readonly object AccessToInitialized;
         private bool m_Initialized;
 
@@ -78,78 +74,15 @@ namespace MapGenerator.Containers
             }
         }
 
-        protected void InitializeExpanses(Callback callback)
+        protected void InitializeExpanses()
         {
-            ExpansesInitializedCallback = callback;
             for (int i = 0; i < Expanses.Length; i++)
             {
                 Expanses[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Expanses[i].Initialize(ExpanseInitialized);
+                Expanses[i].Initialize();
+                Quadtree.Insert(Expanses[i]);
+                SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Expanses[i].Radius);
             }
-        }
-
-        private void ExpanseInitialized()
-        {
-            if (AllExpansesInitialized())
-            {
-                for (int i = 0; i < Expanses.Length; i++)
-                {
-                    Quadtree.Insert(Expanses[i]);
-                    SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Expanses[i].Radius);
-                }
-                ExpansesInitializedCallback();
-            }
-        }
-
-        private bool AllExpansesInitialized()
-        {
-            bool allExpansesInitialized = true;
-            for (int i = 0; i < Expanses.Length; i++)
-            {
-                allExpansesInitialized &= Expanses[i].Initialized;
-            }
-            return allExpansesInitialized;
-        }
-
-        protected void AllocateGroups(int number)
-        {
-            Groups = new Group[number];
-            for (int i = 0; i < Groups.Length; i++)
-            {
-                Groups[i] = new Group(RNG.Next(), false);
-            }
-        }
-
-        protected void InitializeGroups(Callback callback)
-        {
-            GroupsInitializedCallback = callback;
-            for (int i = 0; i < Groups.Length; i++)
-            {
-                Groups[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                InitializeGroup thread = new InitializeGroup(Groups[i], OnGroupInitialized);
-                ThreadManager.Instance.Enqueue(thread);
-            }
-        }
-
-        public void OnGroupInitialized(Group group)
-        {
-            Quadtree.Insert(group);
-            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, group.Radius);
-
-            if (AllGroupsInitialized())
-            {
-                GroupsInitializedCallback();
-            }
-        }
-
-        private bool AllGroupsInitialized()
-        {
-            bool allGroupsInitialized = true;
-            for (int i = 0; i < Groups.Length; i++)
-            {
-                allGroupsInitialized &= Groups[i].Initialized;
-            }
-            return allGroupsInitialized;
         }
 
         protected void AllocateGalaxies(int number)
@@ -189,26 +122,6 @@ namespace MapGenerator.Containers
                 Sectors[i].Initialize();
                 Quadtree.Insert(Sectors[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Sectors[i].Radius);
-            }
-        }
-
-        protected void AllocateClouds(int number)
-        {
-            Clouds = new Cloud[number];
-            for (int i = 0; i < Clouds.Length; i++)
-            {
-                Clouds[i] = new Cloud(RNG.Next(), false);
-            }
-        }
-
-        protected void InitializeClouds()
-        {
-            for (int i = 0; i < Clouds.Length; i++)
-            {
-                Clouds[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Clouds[i].Initialize();
-                Quadtree.Insert(Clouds[i]);
-                SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Clouds[i].Radius);
             }
         }
 
@@ -326,19 +239,12 @@ namespace MapGenerator.Containers
         public void CalculateGlobalPositions(Vector2 parentPosition)
         {
             GlobalPosition = parentPosition + LocalPosition;
-
+            
             if (Expanses != null)
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
                     Expanses[i].CalculateGlobalPositions(GlobalPosition);
-                }
-            }
-            if (Groups != null)
-            {
-                for (int i = 0; i < Groups.Length; i++)
-                {
-                    Groups[i].CalculateGlobalPositions(GlobalPosition);
                 }
             }
             if (Galaxies != null)
@@ -353,13 +259,6 @@ namespace MapGenerator.Containers
                 for (int i = 0; i < Sectors.Length; i++)
                 {
                     Sectors[i].CalculateGlobalPositions(GlobalPosition);
-                }
-            }
-            if (Clouds != null)
-            {
-                for (int i = 0; i < Clouds.Length; i++)
-                {
-                    Clouds[i].CalculateGlobalPositions(GlobalPosition);
                 }
             }
             if (SolarSystems != null)

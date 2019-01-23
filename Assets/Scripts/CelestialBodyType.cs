@@ -3,10 +3,8 @@
     Planet,
     Star,
     SolarSystem,
-    Cloud,
     Sector,
     Galaxy,
-    Group,
     Expanse,
     Universe
 }

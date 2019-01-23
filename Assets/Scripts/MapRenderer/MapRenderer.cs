@@ -11,13 +11,11 @@ public class MapRenderer
     {
         new Color(1.0f, 1.0f, 1.0f),
         new Color(1.0f, 1.0f, 1.0f),
-        new Color(0.6f, 0.6f, 0.6f),
         new Color(0.5f, 0.5f, 0.5f),
         new Color(0.4f, 0.4f, 0.4f),
         new Color(0.3f, 0.3f, 0.3f),
         new Color(0.2f, 0.2f, 0.2f),
-        new Color(0.1f, 0.1f, 0.1f),
-        new Color(0.0f, 0.0f, 0.0f)
+        new Color(0.1f, 0.1f, 0.1f)
     };
     private static readonly Color BACKGROUND_COLOR = new Color(0f, 0f, 0f);
 
@@ -46,10 +44,6 @@ public class MapRenderer
 
         LargestRadii = CreateLargestRadiisDictionary();
         List<CelestialBodies.CelestialBody> contents = body.GetAllContents(LargestRadii);
-        if (body.Type == CelestialBodyType.Universe)
-        {
-            contents.Remove(body);
-        }
         Quadtree.InsertAll(contents);
         GameManager.Instance.Quadtree = Quadtree;
     }
@@ -61,10 +55,8 @@ public class MapRenderer
             { CelestialBodyType.Planet, 0f },
             { CelestialBodyType.Star, 0f },
             { CelestialBodyType.SolarSystem, 0f },
-            { CelestialBodyType.Cloud, 0f },
             { CelestialBodyType.Sector, 0f },
             { CelestialBodyType.Galaxy, 0f },
-            { CelestialBodyType.Group, 0f },
             { CelestialBodyType.Expanse, 0f },
             { CelestialBodyType.Universe, 0f }
         };

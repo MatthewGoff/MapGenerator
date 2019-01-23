@@ -20,9 +20,8 @@ namespace MapGenerator.Containers
                 population = RNG.Next(MIN_SECTORS, MAX_SECTORS + 1);
             }
             AllocateSectors(population);
-            AllocateClouds(population * 2);
-            AllocateSolarSystems(population * 4);
-            AllocateStars(population * 8);
+            AllocateSolarSystems(population * 2);
+            AllocateStars(population * 4);
             ProgressTracker.Instance.TotalGalaxies++;
         }
 
@@ -30,8 +29,6 @@ namespace MapGenerator.Containers
         {
             InitializeSectors();
             Distribute(true, true);
-            InitializeClouds();
-            Distribute(false, true);
             InitializeSolarSystems();
             Distribute(false, true);
             InitializeStars();
