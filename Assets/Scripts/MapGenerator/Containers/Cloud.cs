@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_SOLAR_SYSTEMS = 9;
         public static readonly float MAX_RADIUS = SolarSystem.MAX_RADIUS * 4;
 
-        public Cloud(Vector2 localPosition, int randomSeed, bool root) : base(CelestialBodyType.Cloud, localPosition, 1f, randomSeed, MAX_RADIUS, root)
+        public Cloud(int randomSeed, bool root) : base(CelestialBodyType.Cloud, 1f, randomSeed, MAX_RADIUS, root)
         {
             int population;
             if (root)
@@ -19,11 +19,19 @@ namespace MapGenerator.Containers
             {
                 population = RNG.Next(MIN_SOLAR_SYSTEMS, MAX_SOLAR_SYSTEMS + 1);
             }
-            CreateSolarSystems(population);
+            AllocateSolarSystems(population);
+            AllocateStars(population * 2);
+            ProgressTracker.Instance.TotalClouds++;
+        }
+
+        public override void Initialize(Callback callback = null)
+        {
+            InitializeSolarSystems();
             Distribute(true, true);
-            CreateStars(SolarSystems.Length * 2);
+            InitializeStars();
             Distribute(false, true);
             FinalizeContainer();
+            ProgressTracker.Instance.CloudsInitialized++;
         }
     }
 }

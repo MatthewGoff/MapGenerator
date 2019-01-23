@@ -7,9 +7,9 @@ namespace MapGenerator
         public static ThreadManager Instance;
 
         private readonly int MaximumThreads;
-        private Queue<ThreadedJob> ThreadQueue;
+        private readonly Queue<ThreadedJob> ThreadQueue;
         private readonly object AccessToThreadQueue;
-        private List<ThreadedJob> RunningThreads;
+        private readonly List<ThreadedJob> RunningThreads;
 
         public static void Initialize(int maximumThreads)
         {
@@ -20,6 +20,8 @@ namespace MapGenerator
         {
             AccessToThreadQueue = new object();
             MaximumThreads = maximumThreads;
+            ThreadQueue = new Queue<ThreadedJob>();
+            RunningThreads = new List<ThreadedJob>();
         }
 
         public void Enqueue(ThreadedJob thread)

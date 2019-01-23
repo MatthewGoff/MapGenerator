@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MapGenerator
 {
@@ -23,44 +24,59 @@ namespace MapGenerator
             MapSize = mapSize;
             MapSeed = seed;
             FinishedCallback = callback;
-            maxThreads = Mathf.Min(2, maxThreads);
+            maxThreads = Mathf.Max(2, maxThreads);
             ThreadManager.Initialize(maxThreads - 1);
+            ProgressTracker.Initialize();
+        }
+
+        private void PreInitializeMap(CelestialBodyType size, int seed)
+        {
+            if (size == CelestialBodyType.Universe)
+            {
+                Map = new Containers.Universe(seed, true);
+            }
+            else if (size == CelestialBodyType.Expanse)
+            {
+                Map = new Containers.Expanse(seed, true);
+            }
+            else if (size == CelestialBodyType.Group)
+            {
+                Map = new Containers.Group(seed, true);
+            }
+            else if (size == CelestialBodyType.Galaxy)
+            {
+                Map = new Containers.Galaxy(seed, true);
+            }
+            else if (size == CelestialBodyType.Sector)
+            {
+                Map = new Containers.Sector(seed, true);
+            }
+            else if (size == CelestialBodyType.Cloud)
+            {
+                Map = new Containers.Cloud(seed, true);
+            }
+            else
+            {
+                Map = new Containers.SolarSystem(seed, true);
+            }
         }
 
         protected override void ThreadFunction()
         {
-            if (MapSize == CelestialBodyType.Universe)
-            {
-                Map = new Containers.Universe(new Vector2(0f, 0f), MapSeed, true);
-            }
-            else if (MapSize == CelestialBodyType.Expanse)
-            {
-                Map = new Containers.Expanse(new Vector2(0f, 0f), MapSeed, true);
-            }
-            else if (MapSize == CelestialBodyType.Group)
-            {
-                Map = new Containers.Group(new Vector2(0f, 0f), MapSeed, true);
-            }
-            else if (MapSize == CelestialBodyType.Galaxy)
-            {
-                Map = new Containers.Galaxy(new Vector2(0f, 0f), MapSeed, true);
-            }
-            else if (MapSize == CelestialBodyType.Sector)
-            {
-                Map = new Containers.Sector(new Vector2(0f, 0f), MapSeed, true);
-            }
-            else if (MapSize == CelestialBodyType.Cloud)
-            {
-                Map = new Containers.Cloud(new Vector2(0f, 0f), MapSeed, true);
-            }
-            else
-            {
-                Map = new Containers.SolarSystem(new Vector2(0f, 0f), MapSeed, true);
-            }
+            ProgressTracker.Instance.PushActivity("Creating the " + MapSize.ToString());
+            ProgressTracker.Instance.PushActivity("Allocating space");
+            PreInitializeMap(MapSize, MapSeed);
+            ProgressTracker.Instance.PopActivity();
+
+            ProgressTracker.Instance.PushActivity("Populating");
+            ProgressTracker.Instance.PushActivity("Creating minutiae");
+            Map.Initialize();
             while (!Map.Initialized)
             {
                 ThreadManager.Instance.Update();
             }
+            ProgressTracker.Instance.PopActivity();
+            ProgressTracker.Instance.PopActivity();
         }
 
         protected override void OnFinished()

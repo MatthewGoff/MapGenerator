@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class MapRenderer
 {
+    /// <summary>
+    /// This array maps celestial body type to the visual color of that body.
+    /// It is an array and not a dictionary for performance reasons.
+    /// </summary>
     private static readonly Color[] COLOR = new Color[]
     {
         new Color(1.0f, 1.0f, 1.0f),
@@ -15,11 +19,12 @@ public class MapRenderer
         new Color(0.1f, 0.1f, 0.1f),
         new Color(0.0f, 0.0f, 0.0f)
     };
+    private static readonly Color BACKGROUND_COLOR = new Color(0f, 0f, 0f);
 
+    private readonly Dictionary<CelestialBodyType, float> LargestRadii;
     private readonly Quadtree Quadtree;
     private readonly int ScreenWidth;
     private readonly int ScreenHeight;
-
     private readonly Texture2D Texture;
     private Color[] CurrentFrameColorArray;
     private Color[] LastFrameColorArray;
@@ -38,8 +43,43 @@ public class MapRenderer
             body.Position.y - body.Radius,
             body.Position.x - body.Radius,
             body.Position.x + body.Radius);
-        Quadtree.InsertAll(body.GetAllContents());
+
+        LargestRadii = CreateLargestRadiisDictionary();
+        List<CelestialBodies.CelestialBody> contents = body.GetAllContents(LargestRadii);
+        if (body.Type == CelestialBodyType.Universe)
+        {
+            contents.Remove(body);
+        }
+        Quadtree.InsertAll(contents);
         GameManager.Instance.Quadtree = Quadtree;
+    }
+
+    private Dictionary<CelestialBodyType, float> CreateLargestRadiisDictionary()
+    {
+        Dictionary<CelestialBodyType, float> largestRadiusDictionary = new Dictionary<CelestialBodyType, float>
+        {
+            { CelestialBodyType.Planet, 0f },
+            { CelestialBodyType.Star, 0f },
+            { CelestialBodyType.SolarSystem, 0f },
+            { CelestialBodyType.Cloud, 0f },
+            { CelestialBodyType.Sector, 0f },
+            { CelestialBodyType.Galaxy, 0f },
+            { CelestialBodyType.Group, 0f },
+            { CelestialBodyType.Expanse, 0f },
+            { CelestialBodyType.Universe, 0f }
+        };
+        return largestRadiusDictionary;
+    }
+
+    private CelestialBodyType MaximumLevelOfDetail(Rect worldRect)
+    {
+        float UPP = worldRect.width / ScreenWidth;
+        CelestialBodyType minimumType = 0;
+        while(LargestRadii[minimumType] * 2 < UPP && minimumType < CelestialBodyType.Universe)
+        {
+            minimumType++;
+        }
+        return minimumType;
     }
 
     /// <summary>
@@ -55,8 +95,9 @@ public class MapRenderer
             return new Texture2D(ScreenWidth, ScreenHeight);
         }
 
-        List<CelestialBodies.CelestialBody> bodies = Quadtree.GetOverlappingBodies(worldRect);
+        List<CelestialBodies.CelestialBody> bodies = Quadtree.GetLocalBodies(worldRect, MaximumLevelOfDetail(worldRect));
         bodies.Sort((a, b) => (int)b.Type - (int)a.Type);
+        ClearToBackgroundColor(CurrentFrameColorArray);
 
         if (worldRect.width == LastFrameWorldRect.width)
         {
@@ -81,6 +122,14 @@ public class MapRenderer
         LastFrameWorldRect = worldRect;
 
         return Texture;
+    }
+
+    private void ClearToBackgroundColor(Color[] CurrentFrameColorArray)
+    {
+        for (int i = 0; i < CurrentFrameColorArray.Length; i++)
+        {
+            CurrentFrameColorArray[i] = BACKGROUND_COLOR;
+        }
     }
 
     /// <summary>

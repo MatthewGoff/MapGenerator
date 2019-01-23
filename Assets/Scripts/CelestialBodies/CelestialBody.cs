@@ -24,6 +24,22 @@ namespace CelestialBodies
             Position = container.GlobalPosition;
             Radius = container.Radius;
             
+            if (container.Expanses != null)
+            {
+                Expanses = new Expanse[container.Expanses.Length];
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    Expanses[i] = new Expanse(container.Expanses[i]);
+                }
+            }
+            if (container.Groups != null)
+            {
+                Groups = new Group[container.Groups.Length];
+                for (int i = 0; i < Groups.Length; i++)
+                {
+                    Groups[i] = new Group(container.Groups[i]);
+                }
+            }
             if (container.Galaxies != null)
             {
                 Galaxies = new Galaxy[container.Galaxies.Length];
@@ -74,8 +90,16 @@ namespace CelestialBodies
             }
         }
 
-        public List<CelestialBody> GetAllContents()
+        /// <summary>
+        /// Get a list of all the contents in the body, including the body
+        /// itself. Also update the provided dictionary with the largest body
+        /// of each type.
+        /// </summary>
+        /// <param name="largestRadii"></param>
+        /// <returns></returns>
+        public List<CelestialBody> GetAllContents(Dictionary<CelestialBodyType, float> largestRadii)
         {
+            largestRadii[Type] = Mathf.Max(largestRadii[Type], Radius);
             List<CelestialBody> list = new List<CelestialBody>
             {
                 this
@@ -85,48 +109,49 @@ namespace CelestialBodies
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
-                    list.AddRange(Expanses[i].GetAllContents());
+                    list.AddRange(Expanses[i].GetAllContents(largestRadii));
                 }
             }
             if (Groups != null)
             {
                 for (int i = 0; i < Groups.Length; i++)
                 {
-                    list.AddRange(Groups[i].GetAllContents());
+                    list.AddRange(Groups[i].GetAllContents(largestRadii));
                 }
             }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
                 {
-                    list.AddRange(Galaxies[i].GetAllContents());
+                    list.AddRange(Galaxies[i].GetAllContents(largestRadii));
                 }
             }
             if (Sectors != null)
             {
                 for (int i = 0; i < Sectors.Length; i++)
                 {
-                    list.AddRange(Sectors[i].GetAllContents());
+                    list.AddRange(Sectors[i].GetAllContents(largestRadii));
                 }
             }
             if (Clouds != null)
             {
                 for (int i = 0; i < Clouds.Length; i++)
                 {
-                    list.AddRange(Clouds[i].GetAllContents());
+                    list.AddRange(Clouds[i].GetAllContents(largestRadii));
                 }
             }
             if (SolarSystems != null)
             {
                 for (int i = 0; i < SolarSystems.Length; i++)
                 {
-                    list.AddRange(SolarSystems[i].GetAllContents());
+                    list.AddRange(SolarSystems[i].GetAllContents(largestRadii));
                 }
             }
             if (Stars != null)
             {
                 for (int i = 0; i < Stars.Length; i++)
                 {
+                    largestRadii[CelestialBodyType.Star] = Mathf.Max(largestRadii[CelestialBodyType.Star], Stars[i].Radius);
                     list.Add(Stars[i]);
                 }
             }
@@ -134,6 +159,7 @@ namespace CelestialBodies
             {
                 for (int i = 0; i < Planets.Length; i++)
                 {
+                    largestRadii[CelestialBodyType.Planet] = Mathf.Max(largestRadii[CelestialBodyType.Planet], Planets[i].Radius);
                     list.Add(Planets[i]);
                 }
             }

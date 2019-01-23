@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MapGenerator.Containers
 {
@@ -10,7 +11,7 @@ namespace MapGenerator.Containers
     /// </summary>
     public abstract class Container : CircleRigidBody
     {
-        public static readonly float MAX_ITERATIONS = 1000;
+        public static readonly int MAX_ITERATIONS = 1000;
         public delegate void Callback();
 
         public Expanse[] Expanses { get; protected set; }
@@ -48,15 +49,13 @@ namespace MapGenerator.Containers
         protected System.Random RNG;
 
         private readonly bool Root;
-        private Callback GroupsCreatedCallback;
-        private Callback ExpansesCreatedCallback;
-        private readonly object AccessToGroups;
+        private Callback GroupsInitializedCallback;
+        private Callback ExpansesInitializedCallback;
         private readonly object AccessToInitialized;
         private bool m_Initialized;
 
-        public Container(CelestialBodyType type, Vector2 localPosition, float radius, int randomSeed, float quadtreeRadius, bool root, bool immovable = false) : base(localPosition, radius, immovable)
+        public Container(CelestialBodyType type, float radius, int randomSeed, float quadtreeRadius, bool root, bool immovable = false) : base(radius, immovable)
         {
-            AccessToGroups = new object();
             AccessToInitialized = new object();
             Type = type;
             RNG = new System.Random(randomSeed);
@@ -65,148 +64,215 @@ namespace MapGenerator.Containers
             Root = root;
         }
 
-        protected void CreateExpanses(int number, Callback callback)
+        public virtual void Initialize(Callback callback = null)
         {
-            ExpansesCreatedCallback = callback;
+
+        }
+
+        protected void AllocateExpanses(int number)
+        {
             Expanses = new Expanse[number];
-            for (int i = 0; i < Groups.Length; i++)
+            for (int i = 0; i < Expanses.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Expanses[i] = new Expanse(localPosition, RNG.Next(), false, ExpanseCreated);
+                Expanses[i] = new Expanse(RNG.Next(), false);
             }
         }
 
-        private void ExpanseCreated()
+        protected void InitializeExpanses(Callback callback)
         {
-            if (AllExpansesCreated())
+            ExpansesInitializedCallback = callback;
+            for (int i = 0; i < Expanses.Length; i++)
+            {
+                Expanses[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
+                Expanses[i].Initialize(ExpanseInitialized);
+            }
+        }
+
+        private void ExpanseInitialized()
+        {
+            if (AllExpansesInitialized())
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
                     Quadtree.Insert(Expanses[i]);
                     SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Expanses[i].Radius);
                 }
-                ExpansesCreatedCallback();
+                ExpansesInitializedCallback();
             }
         }
 
-        private bool AllExpansesCreated()
+        private bool AllExpansesInitialized()
         {
-            bool allExpansesCreated = true;
+            bool allExpansesInitialized = true;
             for (int i = 0; i < Expanses.Length; i++)
             {
-                allExpansesCreated &= Expanses[i].Initialized;
+                allExpansesInitialized &= Expanses[i].Initialized;
             }
-            return allExpansesCreated;
+            return allExpansesInitialized;
         }
 
-        protected void CreateGroups(int number, Callback callback)
+        protected void AllocateGroups(int number)
         {
-            GroupsCreatedCallback = callback;
             Groups = new Group[number];
             for (int i = 0; i < Groups.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                CreateGroup thread = new CreateGroup(localPosition, RNG.Next(), GroupCreated);
+                Groups[i] = new Group(RNG.Next(), false);
+            }
+        }
+
+        protected void InitializeGroups(Callback callback)
+        {
+            GroupsInitializedCallback = callback;
+            for (int i = 0; i < Groups.Length; i++)
+            {
+                Groups[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
+                InitializeGroup thread = new InitializeGroup(Groups[i], OnGroupInitialized);
                 ThreadManager.Instance.Enqueue(thread);
             }
         }
 
-        public void GroupCreated(Group group)
+        public void OnGroupInitialized(Group group)
         {
-            bool allGroupsCreated;
-            lock (AccessToGroups)
-            {
-                int i = 0;
-                while(Groups[i] != null)
-                {
-                    i++;
-                }
-                Groups[i] = group;
-                Quadtree.Insert(Groups[i]);
-                SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Groups[i].Radius);
+            Quadtree.Insert(group);
+            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, group.Radius);
 
-                allGroupsCreated = (i == Groups.Length - 1);
-            }
-
-            if (allGroupsCreated)
+            if (AllGroupsInitialized())
             {
-                GroupsCreatedCallback();
+                GroupsInitializedCallback();
             }
         }
 
-        protected void CreateGalaxies(int number)
+        private bool AllGroupsInitialized()
+        {
+            bool allGroupsInitialized = true;
+            for (int i = 0; i < Groups.Length; i++)
+            {
+                allGroupsInitialized &= Groups[i].Initialized;
+            }
+            return allGroupsInitialized;
+        }
+
+        protected void AllocateGalaxies(int number)
         {
             Galaxies = new Galaxy[number];
             for (int i = 0; i < Galaxies.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Galaxies[i] = new Galaxy(localPosition, RNG.Next(), false);
+                Galaxies[i] = new Galaxy(RNG.Next(), false);
+            }
+        }
+
+        protected void InitializeGalaxies()
+        {
+            for (int i = 0; i < Galaxies.Length; i++)
+            {
+                Galaxies[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
+                Galaxies[i].Initialize();
                 Quadtree.Insert(Galaxies[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Galaxies[i].Radius);
             }
         }
-        
-        protected void CreateSectors(int number)
+
+        protected void AllocateSectors(int number)
         {
             Sectors = new Sector[number];
             for (int i = 0; i < Sectors.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Sectors[i] = new Sector(localPosition, RNG.Next(), false);
+                Sectors[i] = new Sector(RNG.Next(), false);
+            }
+        }
+
+        protected void InitializeSectors()
+        {
+            for (int i = 0; i < Sectors.Length; i++)
+            {
+                Sectors[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
+                Sectors[i].Initialize();
                 Quadtree.Insert(Sectors[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Sectors[i].Radius);
             }
         }
 
-        protected void CreateClouds(int number)
+        protected void AllocateClouds(int number)
         {
             Clouds = new Cloud[number];
             for (int i = 0; i < Clouds.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Clouds[i] = new Cloud(localPosition, RNG.Next(), false);
+                Clouds[i] = new Cloud(RNG.Next(), false);
+            }
+        }
+
+        protected void InitializeClouds()
+        {
+            for (int i = 0; i < Clouds.Length; i++)
+            {
+                Clouds[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
+                Clouds[i].Initialize();
                 Quadtree.Insert(Clouds[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Clouds[i].Radius);
             }
         }
 
-        protected void CreateSolarSystems(int number)
+        protected void AllocateSolarSystems(int number)
         {
             SolarSystems = new SolarSystem[number];
             for (int i = 0; i < SolarSystems.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                SolarSystems[i] = new SolarSystem(localPosition, RNG.Next(), false);
+                SolarSystems[i] = new SolarSystem(RNG.Next(), false);
+            }
+        }
+
+        protected void InitializeSolarSystems()
+        {
+            for (int i = 0; i < SolarSystems.Length; i++)
+            {
+                SolarSystems[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
+                SolarSystems[i].Initialize();
                 Quadtree.Insert(SolarSystems[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, SolarSystems[i].Radius);
             }
         }
 
-        protected void CreateStars(int number)
+        protected void AllocateStars(int number)
         {
             Stars = new Star[number];
             for (int i = 0; i < Stars.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Stars[i] = new Star(localPosition, RNG.Next(), false, false);
+                Stars[i] = new Star(RNG.Next(), false, false);
+            }
+        }
+
+        protected void InitializeStars()
+        {
+            for (int i = 0; i < Stars.Length; i++)
+            {
+                ProgressTracker.Instance.StarsInitialized++;
+                Stars[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
                 Quadtree.Insert(Stars[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Stars[i].Radius);
             }
         }
 
-        protected void CreatePlanets(int number)
+        protected void AllocatePlanets(int number)
         {
             Planets = new Planet[number];
             for (int i = 0; i < Planets.Length; i++)
             {
-                Vector2 localPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Planets[i] = new Planet(localPosition, RNG.Next(), false);
+                Planets[i] = new Planet(RNG.Next(), false);
+            }
+        }
+
+        protected void InitializePlanets()
+        {
+            for (int i = 0; i < Planets.Length; i++)
+            {
+                ProgressTracker.Instance.PlanetsInitialized++;
+                Planets[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
                 Quadtree.Insert(Planets[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Planets[i].Radius);
             }
         }
 
-        public void Distribute(bool growRadius, bool bounded)
+        public int Distribute(bool growRadius, bool bounded, bool updateProgressTracker = false, int depth = 0)
         {
             float radiusIncrement = SmallestContainerRadius / 10f;
 
@@ -214,17 +280,29 @@ namespace MapGenerator.Containers
             int iterations = 0;
             do
             {
+                if (updateProgressTracker)
+                {
+                    ProgressTracker.Instance.PushActivity("Iteration " + (iterations + depth * MAX_ITERATIONS).ToString());
+                }
                 if (growRadius)
                 {
                     Radius += radiusIncrement;
                 }
                 maxOverlap = Quadtree.ResolveCollisions(bounded);
                 iterations++;
+                if (updateProgressTracker)
+                {
+                    ProgressTracker.Instance.PopActivity();
+                }
             } while (maxOverlap > Quadtree.COLLISION_MARGIN && iterations < MAX_ITERATIONS);
             if (iterations >= MAX_ITERATIONS)
             {
-                Radius += radiusIncrement;
-                Distribute(growRadius, bounded);
+                Radius += radiusIncrement * (depth + 1);
+                return iterations + Distribute(growRadius, bounded, updateProgressTracker, depth + 1);
+            }
+            else
+            {
+                return iterations;
             }
         }
 

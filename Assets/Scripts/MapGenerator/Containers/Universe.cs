@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_SECTORS = 9;
         public static readonly float MAX_RADIUS = Group.MAX_RADIUS * 4;
 
-        public Universe(Vector2 localPosition, int randomSeed, bool root) : base(CelestialBodyType.Universe, localPosition, 1f, randomSeed, MAX_RADIUS, root)
+        public Universe(int randomSeed, bool root) : base(CelestialBodyType.Universe, 1f, randomSeed, MAX_RADIUS, root)
         {
             int population;
             if (root)
@@ -19,30 +19,42 @@ namespace MapGenerator.Containers
             {
                 population = RNG.Next(MIN_SECTORS, MAX_SECTORS + 1);
             }
-
-            CreateExpanses(population, FinishedCreatingExpanses);
+            AllocateExpanses(population);
+            AllocateGroups(population * 2);
+            AllocateGalaxies(population * 4);
+            AllocateSectors(population * 8);
+            AllocateClouds(population * 16);
+            AllocateSolarSystems(population * 32);
+            AllocateStars(population * 64);
+            ProgressTracker.Instance.TotalUniverses++;
         }
 
-        public void FinishedCreatingExpanses()
+        public override void Initialize(Callback callback = null)
+        {
+            InitializeExpanses(ExpansesInitialized);
+        }
+
+        public void ExpansesInitialized()
         {
             Distribute(true, true);
-            CreateGroups(Expanses.Length * 2, FinishedCreatingGroups);
+            InitializeGroups(GroupsInitialized);
         }
 
-        public void FinishedCreatingGroups()
+        public void GroupsInitialized()
         {
             Distribute(false, true);
-            CreateGalaxies(Groups.Length * 2);
+            InitializeGalaxies();
             Distribute(false, true);
-            CreateSectors(Galaxies.Length * 2);
+            InitializeSectors();
             Distribute(false, true);
-            CreateClouds(Sectors.Length * 2);
+            InitializeClouds();
             Distribute(false, true);
-            CreateSolarSystems(Clouds.Length * 2);
+            InitializeSolarSystems();
             Distribute(false, true);
-            CreateStars(SolarSystems.Length * 2);
+            InitializeStars();
             Distribute(false, true);
             FinalizeContainer();
+            ProgressTracker.Instance.UniversesInitialized++;
         }
     }
 }

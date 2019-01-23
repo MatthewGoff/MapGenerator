@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public readonly bool PlainRendering = true;
-    public bool DrawQuadtree = true;
+    public bool DrawQuadtree = false;
 
     public CelestialBodyType MapSize = CelestialBodyType.SolarSystem;
     public CelestialBodies.CelestialBody Map;
@@ -15,7 +15,9 @@ public class GameManager : MonoBehaviour
     public Quadtree Quadtree;
     public MapRenderer MapRenderer;
     public GameObject Camera;
-    public GameObject Square;
+    public GameObject MapGenScreen;
+
+    public GameObject marker;
 
     private float TimeStamp;
 
@@ -25,6 +27,16 @@ public class GameManager : MonoBehaviour
 
         //CreateBoxes();
         CreateWorld();
+        //RandomTest();
+    }
+
+    private void RandomTest()
+    {
+        System.Random rng = new System.Random();
+        for (int i = 0; i < 100; i++)
+        {
+            Instantiate(marker, Helpers.InsideUnitCircle(rng) * 10f, Quaternion.identity);
+        }
     }
 
     public void Update()
@@ -36,31 +48,19 @@ public class GameManager : MonoBehaviour
         // Debug.Log(1f/Time.deltaTime);
     }
 
-    private void CreateBoxes()
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            int x = i * 4096;
-            for (int j = 0; j < 8; j++)
-            {
-                int y = j * 4096;
-                Instantiate(Square, new Vector2(x, y), Quaternion.identity);
-            }
-        }
-    }
-
     private void CreateWorld()
     {
         System.Random rng = new System.Random();
-        // int seed = 865259136;
-        int seed = rng.Next();
+        int seed = 547291039;
+        // int seed = rng.Next();
         rng = new System.Random(seed);
         Debug.Log("Seed = " + seed);
 
         TimeStamp = Time.realtimeSinceStartup;
-        MapGenerator.GenerateMap thread = new MapGenerator.GenerateMap(MapSize, rng.Next(), System.Environment.ProcessorCount - 2, OnWorldGenerated);
+        MapGenerator.GenerateMap thread = new MapGenerator.GenerateMap(MapSize, rng.Next(), System.Environment.ProcessorCount - 1, OnWorldGenerated);
         thread.Start();
         StartCoroutine(WaitForMapGeneration(thread));
+        MapGenScreen.SetActive(true);
     }
 
     public IEnumerator WaitForMapGeneration(MapGenerator.GenerateMap thread)
@@ -74,6 +74,7 @@ public class GameManager : MonoBehaviour
 
     private void OnWorldGenerated(MapGenerator.Containers.Container map)
     {
+        Debug.Log(map.Radius);
         Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
         TimeStamp = Time.realtimeSinceStartup;
@@ -81,6 +82,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Transfer Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
         MapRenderer = new MapRenderer(Camera.GetComponent<Camera>().pixelWidth, Camera.GetComponent<Camera>().pixelHeight, Map);
+        MapGenScreen.SetActive(false);
     }
 
     private void CreateMap(MapGenerator.Containers.Container map)

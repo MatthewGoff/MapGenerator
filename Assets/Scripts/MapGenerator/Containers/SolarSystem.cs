@@ -8,12 +8,9 @@ namespace MapGenerator.Containers
         private static readonly int MAX_PLANETS = 9;
         public static readonly float MAX_RADIUS = Planet.MAX_RADIUS * 6;
 
-        public SolarSystem(Vector2 position, int randomSeed, bool root) : base(CelestialBodyType.SolarSystem, position, 5f, randomSeed, MAX_RADIUS, root)
+        public SolarSystem(int randomSeed, bool root) : base(CelestialBodyType.SolarSystem, 5f, randomSeed, MAX_RADIUS, root)
         {
-            Stars = new Star[] { new Star(new Vector2(0, 0), RNG.Next(), true, false) };
-            Quadtree.Insert(Stars[0]);
-            SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Stars[0].Radius);
-
+            Stars = new Star[] { new Star(RNG.Next(), true, false) };
             int population;
             if (root)
             {
@@ -23,9 +20,18 @@ namespace MapGenerator.Containers
             {
                 population = RNG.Next(MIN_PLANETS, MAX_PLANETS + 1);
             }
-            CreatePlanets(population);
+            AllocatePlanets(population);
+            ProgressTracker.Instance.TotalSolarSystems++;
+        }
+
+        public override void Initialize(Callback callback = null)
+        {
+            InitializeStars();
+            Stars[0].LocalPosition = new Vector2(0, 0);
+            InitializePlanets();        
             Distribute(false, false);
             FinalizeContainer();
+            ProgressTracker.Instance.SolarSystemsInitialized++;
         }
     }
 }

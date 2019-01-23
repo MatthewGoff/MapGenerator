@@ -74,7 +74,7 @@ public static class Helpers
         float radius = Mathf.Sqrt((float)rng.NextDouble());
         float theta = (float)rng.NextDouble() * 2 * Mathf.PI;
         float x = radius * Mathf.Cos(theta);
-        float y = radius * Mathf.Sign(theta);
+        float y = radius * Mathf.Sin(theta);
         return new Vector2(x, y);
     }
 }

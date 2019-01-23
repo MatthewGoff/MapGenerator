@@ -41,9 +41,8 @@ namespace MapGenerator
 
         protected readonly bool Immovable = false;
 
-        public CircleRigidBody(Vector2 localPosition, float radius, bool immovable)
+        public CircleRigidBody(float radius, bool immovable)
         {
-            LocalPosition = localPosition;
             Radius = radius;
             Mass = Mathf.Pow(Radius, 2);
             Immovable = immovable;

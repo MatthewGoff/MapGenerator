@@ -2,25 +2,22 @@
 
 namespace MapGenerator
 {
-    public class CreateGroup : ThreadedJob
+    public class InitializeGroup : ThreadedJob
     {
         public delegate void Callback(Containers.Group group);
 
-        private readonly Vector2 LocalPosition;
-        private readonly int RandomSeed;
         private Containers.Group Group;
         private readonly Callback FinishedCallback;
 
-        public CreateGroup(Vector2 localPosition, int randomSeed, Callback callback)
+        public InitializeGroup(Containers.Group group, Callback callback)
         {
-            LocalPosition = localPosition;
-            RandomSeed = randomSeed;
+            Group = group;
             FinishedCallback = callback;
         }
 
         protected override void ThreadFunction()
         {
-            Group = new Containers.Group(LocalPosition, RandomSeed, false);
+            Group.Initialize();
         }
 
         protected override void OnFinished()

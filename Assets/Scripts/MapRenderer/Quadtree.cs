@@ -6,10 +6,9 @@ using UnityEngine;
 /// </summary>
 public class Quadtree
 {    
-    private readonly Color BACKGROUND_COLOR = new Color(0f, 0f, 1f);
-
     private readonly int MaximumContents;
     private List<CelestialBodies.CelestialBody> Contents;
+    private CelestialBodyType LargestBody;
 
     private readonly float Top;
     private readonly float Bottom;
@@ -53,6 +52,7 @@ public class Quadtree
     {
         MaximumContents = maximumContents;
         Contents = new List<CelestialBodies.CelestialBody>();
+        LargestBody = CelestialBodyType.Planet;
 
         Top = top;
         Bottom = bottom;
@@ -79,7 +79,7 @@ public class Quadtree
             }
             else
             {
-                Contents.Add(body);
+                FinalizeInsert(body);
             }
         }
         else if (QuadOne.Contains(body))
@@ -100,8 +100,14 @@ public class Quadtree
         }
         else
         {
-            Contents.Add(body);
+            FinalizeInsert(body);
         }
+    }
+
+    private void FinalizeInsert(CelestialBodies.CelestialBody body)
+    {
+        LargestBody = (CelestialBodyType) Mathf.Max((int)LargestBody, (int)body.Type);
+        Contents.Add(body);
     }
 
     private void Split()
@@ -133,49 +139,54 @@ public class Quadtree
         return position.y < Top && position.y > Bottom && position.x > Left && position.x < Right;
     }
 
-    public Color GetPixel(Vector2 position)
-    {
-        Color color = BACKGROUND_COLOR;
-        return new Color(0, 0, 0);
-    }
-
-    public List<CelestialBodies.CelestialBody> GetOverlappingBodies(Rect worldRect)
+    /// <summary>
+    /// Get all bodies who's rect overlaps with the provided worldRect (Cull).
+    /// Disregards all bodies smaller than the provided minimum (LoD).
+    /// </summary>
+    /// <param name="worldRect"></param>
+    /// <param name="minimumSize"></param>
+    /// <returns></returns>
+    public List<CelestialBodies.CelestialBody> GetLocalBodies(Rect worldRect, CelestialBodyType minimumSize)
     {
         List<CelestialBodies.CelestialBody> list = new List<CelestialBodies.CelestialBody>();
 
         Rect rect;
         foreach(CelestialBodies.CelestialBody celestialBody in Contents)
         {
-            rect = new Rect(celestialBody.Position.x - celestialBody.Radius,
-                celestialBody.Position.y - celestialBody.Radius,
-                celestialBody.Radius * 2,
-                celestialBody.Radius * 2);
-            if (rect.Overlaps(worldRect)){
-                list.Add(celestialBody);
+            if (celestialBody.Type >= minimumSize)
+            {
+                rect = new Rect(celestialBody.Position.x - celestialBody.Radius,
+                    celestialBody.Position.y - celestialBody.Radius,
+                    celestialBody.Radius * 2,
+                    celestialBody.Radius * 2);
+                if (rect.Overlaps(worldRect))
+                {
+                    list.Add(celestialBody);
+                }
             }
         }
 
         if (QuadOne != null)
         {
             rect = new Rect(QuadOne.Left, QuadOne.Bottom, QuadOne.Width, QuadOne.Height);
-            if (rect.Overlaps(worldRect))
+            if (rect.Overlaps(worldRect) && QuadOne.LargestBody >= minimumSize)
             {
-                list.AddRange(QuadOne.GetOverlappingBodies(worldRect));
+                list.AddRange(QuadOne.GetLocalBodies(worldRect, minimumSize));
             }
             rect = new Rect(QuadTwo.Left, QuadTwo.Bottom, QuadTwo.Width, QuadTwo.Height);
-            if (rect.Overlaps(worldRect))
+            if (rect.Overlaps(worldRect) && QuadTwo.LargestBody >= minimumSize)
             {
-                list.AddRange(QuadTwo.GetOverlappingBodies(worldRect));
+                list.AddRange(QuadTwo.GetLocalBodies(worldRect, minimumSize));
             }
             rect = new Rect(QuadThree.Left, QuadThree.Bottom, QuadThree.Width, QuadThree.Height);
-            if (rect.Overlaps(worldRect))
+            if (rect.Overlaps(worldRect) && QuadThree.LargestBody >= minimumSize)
             {
-                list.AddRange(QuadThree.GetOverlappingBodies(worldRect));
+                list.AddRange(QuadThree.GetLocalBodies(worldRect, minimumSize));
             }
             rect = new Rect(QuadFour.Left, QuadFour.Bottom, QuadFour.Width, QuadFour.Height);
-            if (rect.Overlaps(worldRect))
+            if (rect.Overlaps(worldRect) && QuadFour.LargestBody >= minimumSize)
             {
-                list.AddRange(QuadFour.GetOverlappingBodies(worldRect));
+                list.AddRange(QuadFour.GetLocalBodies(worldRect, minimumSize));
             }
         }
 
@@ -190,14 +201,10 @@ public class Quadtree
     public List<Vector2> GetLinePoints()
     {
         List<Vector2> returnList = new List<Vector2>();
-        returnList.Add(new Vector2(Left, Top));
-        returnList.Add(new Vector2(Right, Top));
-        returnList.Add(new Vector2(Right, Top));
-        returnList.Add(new Vector2(Right, Bottom));
-        returnList.Add(new Vector2(Right, Bottom));
-        returnList.Add(new Vector2(Left, Bottom));
-        returnList.Add(new Vector2(Left, Bottom));
-        returnList.Add(new Vector2(Left, Top));
+        returnList.Add(new Vector2(HorizontalMedian, Top));
+        returnList.Add(new Vector2(HorizontalMedian, Bottom));
+        returnList.Add(new Vector2(Left, VerticalMedian));
+        returnList.Add(new Vector2(Right, VerticalMedian));
         if (QuadOne != null)
         {
             returnList.AddRange(QuadOne.GetLinePoints());

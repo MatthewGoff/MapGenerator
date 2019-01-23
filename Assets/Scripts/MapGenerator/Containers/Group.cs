@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_GALAXIES = 9;
         public static readonly float MAX_RADIUS = Galaxy.MAX_RADIUS * 4;
 
-        public Group(Vector2 localPosition, int randomSeed, bool root) : base(CelestialBodyType.Group, localPosition, 1f, randomSeed, MAX_RADIUS, root)
+        public Group(int randomSeed, bool root) : base(CelestialBodyType.Group, 1f, randomSeed, MAX_RADIUS, root)
         {
             int population;
             if (root)
@@ -19,17 +19,28 @@ namespace MapGenerator.Containers
             {
                 population = RNG.Next(MIN_GALAXIES, MAX_GALAXIES + 1);
             }
-            CreateGalaxies(population);
+            AllocateGalaxies(population);
+            AllocateSectors(population * 2);
+            AllocateClouds(population * 4);
+            AllocateSolarSystems(population * 8);
+            AllocateStars(population * 16);
+            ProgressTracker.Instance.TotalGroups++;
+        }
+
+        public override void Initialize(Callback callback = null)
+        {
+            InitializeGalaxies();
             Distribute(true, true);
-            CreateSectors(Galaxies.Length * 2);
+            InitializeSectors();
             Distribute(false, true);
-            CreateClouds(Sectors.Length * 2);
+            InitializeClouds();
             Distribute(false, true);
-            CreateSolarSystems(Clouds.Length * 2);
+            InitializeSolarSystems();
             Distribute(false, true);
-            CreateStars(SolarSystems.Length * 2);
+            InitializeStars();
             Distribute(false, true);
             FinalizeContainer();
+            ProgressTracker.Instance.GroupsInitialized++;
         }
     }
 }
