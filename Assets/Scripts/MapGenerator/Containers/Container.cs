@@ -49,6 +49,7 @@ namespace MapGenerator.Containers
         private readonly bool Root;
         private readonly object AccessToInitialized;
         private bool m_Initialized;
+        private Callback ExpansesInitializedCallback;
 
         public Container(CelestialBodyType type, float radius, int randomSeed, float quadtreeRadius, bool root, bool immovable = false) : base(radius, immovable)
         {
@@ -60,7 +61,7 @@ namespace MapGenerator.Containers
             Root = root;
         }
 
-        public virtual void Initialize(Callback callback = null)
+        public virtual void Initialize()
         {
 
         }
@@ -74,15 +75,38 @@ namespace MapGenerator.Containers
             }
         }
 
-        protected void InitializeExpanses()
+        protected void InitializeExpanses(Callback expansesInitializedCallback)
         {
+            ExpansesInitializedCallback = expansesInitializedCallback;
             for (int i = 0; i < Expanses.Length; i++)
             {
                 Expanses[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
-                Expanses[i].Initialize();
-                Quadtree.Insert(Expanses[i]);
-                SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Expanses[i].Radius);
+                InitializeExpanse thread = new InitializeExpanse(Expanses[i], OnExpanseInitialized);
+                ThreadManager.Instance.Enqueue(thread);
             }
+        }
+
+        public void OnExpanseInitialized()
+        {
+            if (AllExpansesInitialized())
+            {
+                for (int i = 0; i < Expanses.Length; i++)
+                {
+                    Quadtree.Insert(Expanses[i]);
+                    SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Expanses[i].Radius);
+                }
+                ExpansesInitializedCallback();
+            }
+        }
+
+        public bool AllExpansesInitialized()
+        {
+            bool allExpansesInitialized = true;
+            for (int i = 0; i < Expanses.Length; i++)
+            {
+                allExpansesInitialized &= Expanses[i].Initialized;
+            }
+            return allExpansesInitialized;
         }
 
         protected void AllocateGalaxies(int number)
@@ -158,7 +182,7 @@ namespace MapGenerator.Containers
         {
             for (int i = 0; i < Stars.Length; i++)
             {
-                ProgressTracker.Instance.StarsInitialized++;
+                ProgressTracker.Instance.StarInitialized();
                 Stars[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
                 Quadtree.Insert(Stars[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Stars[i].Radius);
@@ -178,14 +202,19 @@ namespace MapGenerator.Containers
         {
             for (int i = 0; i < Planets.Length; i++)
             {
-                ProgressTracker.Instance.PlanetsInitialized++;
+                ProgressTracker.Instance.PlanetInitialized();
                 Planets[i].LocalPosition = Helpers.InsideUnitCircle(RNG) * Radius;
                 Quadtree.Insert(Planets[i]);
                 SmallestContainerRadius = Mathf.Min(SmallestContainerRadius, Planets[i].Radius);
             }
         }
 
-        public int Distribute(bool growRadius, bool bounded, bool updateProgressTracker = false, int depth = 0)
+        public int Distribute(bool growRadius, bool bounded)
+        {
+            return Distribute(growRadius, bounded, 0);
+        }
+
+        public int Distribute(bool growRadius, bool bounded, int depth)
         {
             float radiusIncrement = SmallestContainerRadius / 10f;
 
@@ -193,25 +222,19 @@ namespace MapGenerator.Containers
             int iterations = 0;
             do
             {
-                if (updateProgressTracker)
-                {
-                    ProgressTracker.Instance.PushActivity("Iteration " + (iterations + depth * MAX_ITERATIONS).ToString());
-                }
+                StartActivity("Iteration " + (iterations + depth * MAX_ITERATIONS).ToString());
                 if (growRadius)
                 {
                     Radius += radiusIncrement;
                 }
                 maxOverlap = Quadtree.ResolveCollisions(bounded);
                 iterations++;
-                if (updateProgressTracker)
-                {
-                    ProgressTracker.Instance.PopActivity();
-                }
+                EndActivity();
             } while (maxOverlap > Quadtree.COLLISION_MARGIN && iterations < MAX_ITERATIONS);
             if (iterations >= MAX_ITERATIONS)
             {
-                Radius += radiusIncrement * (depth + 1);
-                return iterations + Distribute(growRadius, bounded, updateProgressTracker, depth + 1);
+                Radius += radiusIncrement;
+                return iterations + Distribute(growRadius, bounded, depth + 1);
             }
             else
             {
@@ -234,6 +257,22 @@ namespace MapGenerator.Containers
                 CalculateGlobalPositions(new Vector2(0, 0));
             }
             Initialized = true;
+        }
+
+        protected void StartActivity(string activityDescription)
+        {
+            if (Root)
+            {
+                ProgressTracker.Instance.PushActivity(activityDescription);
+            }
+        }
+        
+        protected void EndActivity()
+        {
+            if (Root)
+            {
+                ProgressTracker.Instance.PopActivity();
+            }
         }
 
         public void CalculateGlobalPositions(Vector2 parentPosition)

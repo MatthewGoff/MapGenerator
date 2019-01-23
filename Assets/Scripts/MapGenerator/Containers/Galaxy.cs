@@ -25,16 +25,28 @@ namespace MapGenerator.Containers
             ProgressTracker.Instance.TotalGalaxies++;
         }
 
-        public override void Initialize(Callback callback = null)
+        public override void Initialize()
         {
+            StartActivity("Creating Sectors");
             InitializeSectors();
+            EndActivity();
+            StartActivity("Initializing Sectors");
             Distribute(true, true);
+            EndActivity();
+            StartActivity("Creating Solar Systems");
             InitializeSolarSystems();
+            EndActivity();
+            StartActivity("Distributing Solar Systems");
             Distribute(false, true);
+            EndActivity();
+            StartActivity("Creating Stars");
             InitializeStars();
+            EndActivity();
+            StartActivity("Distributing Stars");
             Distribute(false, true);
+            EndActivity();
             FinalizeContainer();
-            ProgressTracker.Instance.GalaxiesInitialized++;
+            ProgressTracker.Instance.GalaxyInitialized();
         }
     }
 }

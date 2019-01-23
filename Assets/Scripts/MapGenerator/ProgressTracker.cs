@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace MapGenerator
@@ -364,6 +365,62 @@ namespace MapGenerator
             }
             stackTrace = stackTrace.Substring(0, Mathf.Max(0, stackTrace.Length - 3));
             return stackTrace;
+        }
+
+        public void PlanetInitialized()
+        {
+            lock (AccessToPlanetsInitialized)
+            {
+                m_PlanetsInitialized++;
+            }
+        }
+
+        public void StarInitialized()
+        {
+            lock (AccessToStarsInitialized)
+            {
+                m_StarsInitialized++;
+            }
+        }
+
+        public void SolarSystemInitialized()
+        {
+            lock (AccessToSolarSystemsInitialized)
+            {
+                m_SolarSystemsInitialized++;
+            }
+        }
+
+        public void SectorInitialized()
+        {
+            lock (AccessToSectorsInitialized)
+            {
+                m_SectorsInitialized++;
+            }
+        }
+
+        public void GalaxyInitialized()
+        {
+            lock (AccessToGalaxiesInitialized)
+            {
+                m_GalaxiesInitialized++;
+            }
+        }
+
+        public void ExpanseInitialized()
+        {
+            lock (AccessToExpansesInitialized)
+            {
+                m_ExpansesInitialized++;
+            }
+        }
+
+        public void UniverseInitialized()
+        {
+            lock (AccessToUniversesInitialized)
+            {
+                m_UniversesInitialized++;
+            }
         }
     }
 }

@@ -318,7 +318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &178084775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2437,7 +2437,6 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   Camera: {fileID: 519420028}
   MapGenScreen: {fileID: 178084774}
-  marker: {fileID: 1863774860258534, guid: 56b7db160cbf2ed43b3bdd5f545e7840, type: 2}
 --- !u!4 &1556201048
 Transform:
   m_ObjectHideFlags: 0

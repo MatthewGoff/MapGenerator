@@ -24,14 +24,22 @@ namespace MapGenerator.Containers
             ProgressTracker.Instance.TotalSectors++;
         }
 
-        public override void Initialize(Callback callback = null)
+        public override void Initialize()
         {
+            StartActivity("Create Solar Systems");
             InitializeSolarSystems();
+            EndActivity();
+            StartActivity("Distribute Solar Systems");
             Distribute(true, true);
+            EndActivity();
+            StartActivity("Create Stars");
             InitializeStars();
+            EndActivity();
+            StartActivity("Distribute Stars");
             Distribute(false, true);
+            EndActivity();
             FinalizeContainer();
-            ProgressTracker.Instance.SectorsInitialized++;
+            ProgressTracker.Instance.SectorInitialized();
         }
     }
 }

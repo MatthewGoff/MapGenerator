@@ -26,18 +26,34 @@ namespace MapGenerator.Containers
             ProgressTracker.Instance.TotalExpanses++;
         }
 
-        public override void Initialize(Callback callback = null)
+        public override void Initialize()
         {
+            StartActivity("CreatingGalaxies");
             InitializeGalaxies();
+            EndActivity();
+            StartActivity("Distributing Galaxies");
             Distribute(true, true);
+            EndActivity();
+            StartActivity("Creating Sectors");
             InitializeSectors();
+            EndActivity();
+            StartActivity("Distributing Sectors");
             Distribute(false, true);
+            EndActivity();
+            StartActivity("Creating Solar Systems");
             InitializeSolarSystems();
+            EndActivity();
+            StartActivity("Distributing Solar Systems");
             Distribute(false, true);
+            EndActivity();
+            StartActivity("Creating Stars");
             InitializeStars();
+            EndActivity();
+            StartActivity("Distributing Stars");
             Distribute(false, true);
+            EndActivity();
             FinalizeContainer();
-            ProgressTracker.Instance.ExpansesInitialized++;
+            ProgressTracker.Instance.ExpanseInitialized();
         }
     }
 }

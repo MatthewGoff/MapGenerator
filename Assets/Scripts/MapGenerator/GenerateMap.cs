@@ -61,13 +61,11 @@ namespace MapGenerator
             ProgressTracker.Instance.PopActivity();
 
             ProgressTracker.Instance.PushActivity("Populating");
-            ProgressTracker.Instance.PushActivity("Creating minutiae");
             Map.Initialize();
             while (!Map.Initialized)
             {
                 ThreadManager.Instance.Update();
             }
-            ProgressTracker.Instance.PopActivity();
             ProgressTracker.Instance.PopActivity();
             ProgressTracker.Instance.PopActivity();
         }

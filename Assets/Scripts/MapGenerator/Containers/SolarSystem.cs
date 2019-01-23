@@ -24,14 +24,20 @@ namespace MapGenerator.Containers
             ProgressTracker.Instance.TotalSolarSystems++;
         }
 
-        public override void Initialize(Callback callback = null)
+        public override void Initialize()
         {
+            StartActivity("Creating Star");
             InitializeStars();
             Stars[0].LocalPosition = new Vector2(0, 0);
-            InitializePlanets();        
+            EndActivity();
+            StartActivity("Creating Planets");
+            InitializePlanets();
+            EndActivity();
+            StartActivity("Distributing Planets");
             Distribute(false, false);
+            EndActivity();
             FinalizeContainer();
-            ProgressTracker.Instance.SolarSystemsInitialized++;
+            ProgressTracker.Instance.SolarSystemInitialized();
         }
     }
 }
