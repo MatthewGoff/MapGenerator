@@ -8,12 +8,15 @@ namespace MapRendering
     {
         public GameObject MapCamera;
         public GameObject PlanetsSprite;
+        public GameObject StarsSprite;
 
         private float LargestPlanet;
+        private float LargestStar;
 
-        public void Initialize(CelestialBodies.CelestialBody Map)
+        public void Initialize(CelestialBodies.CelestialBody map)
         {
-            PlanetsSprite.GetComponent<PlanetsSpriteController>().Initialize(Map.GetAllPlanets(ref LargestPlanet));
+            PlanetsSprite.GetComponent<PlanetsSpriteController>().Initialize(map.GetAllPlanets(ref LargestPlanet));
+            StarsSprite.GetComponent<StarsSpriteController>().Initialize(map.GetAllStars(ref LargestStar));
         }
 
         public void OpenMap()
@@ -35,7 +38,9 @@ namespace MapRendering
         {
             Rect cameraRect = MapCamera.GetComponent<CameraController>().GetCameraRect();
             Vector3 scale = new Vector3(cameraRect.width, cameraRect.height, 1f);
+            scale *= 1.2f;
             PlanetsSprite.transform.localScale = scale;
+            StarsSprite.transform.localScale = scale;
         }
     }
 }

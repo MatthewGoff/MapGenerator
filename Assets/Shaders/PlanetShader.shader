@@ -1,10 +1,8 @@
-﻿Shader "Custom/CelestialBodyShader"
+﻿Shader "Custom/PlanetShader"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
-		_ExternalColor("External Color", Color) = (1, 1, 1, 1)
-		_InternalColor("Internal Color", Color) = (1, 1, 1, 1)
 	}
 	SubShader
 	{
@@ -26,9 +24,7 @@
 			#define QUALITY_LEVEL 2
 
 			sampler2D _MainTex;
-			float4 bodies[1000];
-			fixed4 _ExternalColor;
-			fixed4 _InternalColor;
+			float4 planets[1000];
 
 			struct fragmentInput
 			{
@@ -68,12 +64,13 @@
 				[loop]
 				for (int i = 0; i < 100; i++)
 				{
-					float distance = sqrt(pow(fragInput.worldPos.x - bodies[i].x, 2) + pow(fragInput.worldPos.y - bodies[i].y,2));
-					fixed alpha = AntiAliasing(distance, bodies[i].z);
+					float distance = sqrt(pow(fragInput.worldPos.x - planets[i].x, 2) + pow(fragInput.worldPos.y - planets[i].y,2));
+					fixed alpha = AntiAliasing(distance, planets[i].z);
 					if (alpha > 0)
 					{
-						float ratio = distance / bodies[i].z;
-						fixed4 color = lerp(_InternalColor, _ExternalColor, ratio);
+						float2 texturePosition = float2(fragInput.worldPos.x - planets[i].x + planets[i].z, fragInput.worldPos.y - planets[i].y + planets[i].z);
+						texturePosition /= 2 * planets[i].z;
+						fixed4 color = tex2D(_MainTex, texturePosition);
 						return fixed4(color.rgb, alpha);
 					}
 				}

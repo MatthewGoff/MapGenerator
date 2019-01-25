@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
         {
             MapGenScreen.SetActive(!MapGenScreen.activeSelf);
         }
-        // Debug.Log(1f/Time.deltaTime);
+        Debug.Log(1f/Time.deltaTime);
     }
 
     private void CreateWorld()

@@ -12,7 +12,7 @@ namespace MapRendering
             Planets = planets;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             Vector4[] planetVectors = new Vector4[Planets.Count];
             for (int i = 0; i < planetVectors.Length; i++)
