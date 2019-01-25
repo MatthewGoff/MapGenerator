@@ -6,7 +6,7 @@ namespace MapGenerator.Containers
     {
         private static readonly int MIN_PLANETS = 4;
         private static readonly int MAX_PLANETS = 20;
-        public static readonly float MAX_RADIUS = Planet.MAX_RADIUS * 6;
+        public static readonly float MAX_RADIUS = Planet.MAX_RADIUS * 10;
 
         public SolarSystem(int randomSeed, bool root) : base(CelestialBodyType.SolarSystem, 5f, randomSeed, MAX_RADIUS, root)
         {

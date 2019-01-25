@@ -220,7 +220,7 @@ namespace MapGenerator
             {
                 Parent.Rectify(circle);
             }
-            else if (circle.MyQuad != this)
+            else
             {
                 circle.MyQuad.Remove(circle);
                 Insert(circle);
@@ -240,16 +240,12 @@ namespace MapGenerator
         public List<Vector2> GetLinePoints()
         {
             List<Vector2> returnList = new List<Vector2>();
-            returnList.Add(new Vector2(Left, Top));
-            returnList.Add(new Vector2(Right, Top));
-            returnList.Add(new Vector2(Right, Top));
-            returnList.Add(new Vector2(Right, Bottom));
-            returnList.Add(new Vector2(Right, Bottom));
-            returnList.Add(new Vector2(Left, Bottom));
-            returnList.Add(new Vector2(Left, Bottom));
-            returnList.Add(new Vector2(Left, Top));
             if (QuadOne != null)
             {
+                returnList.Add(new Vector2(HorizontalMedian, Top));
+                returnList.Add(new Vector2(HorizontalMedian, Bottom));
+                returnList.Add(new Vector2(Left, VerticalMedian));
+                returnList.Add(new Vector2(Right, VerticalMedian));
                 returnList.AddRange(QuadOne.GetLinePoints());
                 returnList.AddRange(QuadTwo.GetLinePoints());
                 returnList.AddRange(QuadThree.GetLinePoints());

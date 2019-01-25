@@ -230,7 +230,7 @@ namespace MapGenerator.Containers
                 maxOverlap = Quadtree.ResolveCollisions(bounded);
                 iterations++;
                 EndActivity();
-            } while (maxOverlap > Quadtree.COLLISION_MARGIN && iterations < MAX_ITERATIONS);
+            } while (Mathf.Max(maxOverlap) > Quadtree.COLLISION_MARGIN && iterations < MAX_ITERATIONS);
             if (iterations >= MAX_ITERATIONS)
             {
                 Radius += radiusIncrement;

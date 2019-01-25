@@ -5,19 +5,13 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public readonly bool PlainRendering = true;
-    public bool DrawQuadtree = false;
-
-    public CelestialBodyType MapSize = CelestialBodyType.SolarSystem;
-    public CelestialBodies.CelestialBody Map;
-
     public Gradient StarGradient;
-    public Quadtree Quadtree;
-    public MapRenderer MapRenderer;
-    public GameObject Camera;
     public GameObject MapGenScreen;
+    public GameObject MapRenderer;
 
     private float TimeStamp;
+    private readonly CelestialBodyType MapSize = CelestialBodyType.SolarSystem;
+    private CelestialBodies.CelestialBody Map;
 
     private void Awake()
     {
@@ -28,10 +22,6 @@ public class GameManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            DrawQuadtree = !DrawQuadtree;
-        }
         if (Input.GetKeyDown(KeyCode.Space))
         {
             MapGenScreen.SetActive(!MapGenScreen.activeSelf);
@@ -42,8 +32,8 @@ public class GameManager : MonoBehaviour
     private void CreateWorld()
     {
         System.Random rng = new System.Random();
-        // int seed = 547291039;
-        int seed = rng.Next();
+        int seed = 1216466133;
+        // int seed = rng.Next();
         rng = new System.Random(seed);
         Debug.Log("Seed = " + seed);
 
@@ -69,7 +59,8 @@ public class GameManager : MonoBehaviour
 
         CreateMap(map);
 
-        MapRenderer = new MapRenderer(Camera.GetComponent<Camera>().pixelWidth, Camera.GetComponent<Camera>().pixelHeight, Map);
+        MapRenderer.GetComponent<MapRendering.MapRenderer>().Initialize(Map);
+        MapRenderer.GetComponent<MapRendering.MapRenderer>().OpenMap();
     }
 
     private void CreateMap(MapGenerator.Containers.Container map)
@@ -94,21 +85,5 @@ public class GameManager : MonoBehaviour
         {
             Map = new CelestialBodies.SolarSystem((MapGenerator.Containers.SolarSystem)map);
         }
-    }
-    
-    public Rect GetCameraRect()
-    {
-        Camera camera = Camera.GetComponent<Camera>();
-        float height = camera.orthographicSize * 2;
-        float width = height * camera.aspect;
-        Vector2 size = new Vector2(width, height);
-        Vector2 position = (Vector2) camera.transform.position - size / 2f;
-        return new Rect(position, size);
-    }
-
-    public float GetCameraResolution()
-    {
-        Camera camera = Camera.GetComponent<Camera>();
-        return camera.pixelHeight / (camera.orthographicSize * 2f);
     }
 }
