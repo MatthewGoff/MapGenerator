@@ -77,4 +77,38 @@ public static class Helpers
         float y = radius * Mathf.Sin(theta);
         return new Vector2(x, y);
     }
+
+    public static Rect[,] SubdivideRect(Rect rect, int columns, int rows)
+    {
+        Rect[,] rects = new Rect[columns, rows];
+        Vector2 size = new Vector2(rect.width / columns, rect.height / rows);
+
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                float xPosition = (x * rect.width / columns) + rect.xMin;
+                float yPosition = (y * rect.height / rows) + rect.yMin;
+                rects[x, y] = new Rect(new Vector2(xPosition, yPosition), size);
+            }
+        }
+
+        return rects;
+    }
+
+    /// <summary>
+    /// Scale a rect about its center
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <param name="scalar"></param>
+    /// <returns></returns>
+    public static void ScaleRect(ref Rect rect, float scalar)
+    {
+        float dx = (scalar - 1) * (rect.width);
+        float dy = (scalar - 1) * (rect.height);
+        rect.xMin -= dx;
+        rect.yMin -= dy;
+        rect.width *= scalar;
+        rect.height *= scalar;
+    }
 }

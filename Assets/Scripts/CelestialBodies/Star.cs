@@ -6,5 +6,10 @@
         {
 
         }
+
+        public Star(byte[] bytes, int startIndex) : base(bytes, startIndex)
+        {
+
+        }
     }
 }

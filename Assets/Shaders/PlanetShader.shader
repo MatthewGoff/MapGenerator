@@ -13,68 +13,64 @@
 
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma exclude_renderers d3d11_9x
-			#pragma exclude_renderers d3d9
 			#include "UnityCG.cginc"
 
-			// Quality level
-			// 2 == high quality
-			// 1 == medium quality
-			// 0 == low quality
-			#define QUALITY_LEVEL 2
-
 			sampler2D _MainTex;
-			float4 planets[1000];
+			float numberOfPlanets[9];
+			float4 planets[900];
+			float pixelWidth;
 
 			struct fragmentInput
 			{
 				float3 worldPos : TEXCOORD0;
-				float4 screenPos : SV_POSITION;
+				float4 vertex : SV_POSITION;
+				float4 uv : TEXCOORD1;
 			};
 
 			fragmentInput vert(appdata_base v)
 			{
 				fragmentInput o;
-
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
-				o.screenPos = UnityObjectToClipPos(v.vertex);
-
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.uv = float4(v.texcoord.xy, 0, 0);
 				return o;
 			}
 
 			fixed AntiAliasing(float distance, float radius)
 			{
-				#if QUALITY_LEVEL == 2
-					// length derivative, 1.5 pixel smoothstep edge
-					float pwidth = length(float2(ddx(distance), ddy(distance)));
-					return smoothstep(radius, radius - pwidth * 1.5, distance);
-				#elif QUALITY_LEVEL == 1
-					// fwidth, 1.5 pixel smoothstep edge
-					float pwidth = fwidth(distance);
-					return smoothstep(radius, radius - pwidth * 1.5, distance);
-				#else
-					// fwidth, 1 pixel linear edge
-					float pwidth = fwidth(distance);
-					return saturate((radius - distance) / pwidth);
-				#endif
+				float pwidth = distance / pixelWidth;
+				return smoothstep(radius, radius - pwidth * 1.5, distance);
 			}
-
+			
 			fixed4 frag(fragmentInput fragInput) : SV_Target
 			{
-				[loop]
+				int xCoord = floor(3 * fragInput.uv.x);
+				int yCoord = floor(3 * fragInput.uv.y);
+				int offset = (3 * xCoord + yCoord);
+
+				fixed4 returnColor = fixed4(0, 0, 0, 0);
 				for (int i = 0; i < 100; i++)
 				{
-					float distance = sqrt(pow(fragInput.worldPos.x - planets[i].x, 2) + pow(fragInput.worldPos.y - planets[i].y,2));
-					fixed alpha = AntiAliasing(distance, planets[i].z);
-					if (alpha > 0)
+					float4 planet;
+					if (i < numberOfPlanets[offset])
 					{
-						float2 texturePosition = float2(fragInput.worldPos.x - planets[i].x + planets[i].z, fragInput.worldPos.y - planets[i].y + planets[i].z);
-						texturePosition /= 2 * planets[i].z;
+						planet = planets[i + (100 * offset)];
+					}
+					else
+					{
+						planet = fixed4(0, 0, 0, 0);
+					}
+					float distance = sqrt(pow(fragInput.worldPos.x - planet.x, 2) + pow(fragInput.worldPos.y - planet.y, 2));
+					fixed alpha = AntiAliasing(distance, planet.z);
+					if (alpha > returnColor.a)
+					{
+						float2 texturePosition = float2(fragInput.worldPos.x - planet.x + planet.z, fragInput.worldPos.y - planet.y + planet.z);
+						texturePosition /= 2 * planet.z;
 						fixed4 color = tex2D(_MainTex, texturePosition);
-						return fixed4(color.rgb, alpha);
+						returnColor = fixed4(color.rgb, alpha);
 					}
 				}
-				return fixed4(0, 0, 0, 0);
+				return returnColor;
 			}
 
 			ENDCG

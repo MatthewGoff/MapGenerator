@@ -9,8 +9,7 @@ namespace MapRendering
     public class Quadtree
     {
         private readonly int MaximumContents;
-        private List<CelestialBodies.CelestialBody> Contents;
-        private CelestialBodyType LargestBody;
+        private List<Vector4> Contents;
 
         private readonly float Top;
         private readonly float Bottom;
@@ -44,6 +43,7 @@ namespace MapRendering
                 return Top - Bottom;
             }
         }
+        private Rect Rect;
 
         private Quadtree QuadOne;
         private Quadtree QuadTwo;
@@ -53,13 +53,13 @@ namespace MapRendering
         public Quadtree(float top, float bottom, float left, float right, int maximumContents = 5)
         {
             MaximumContents = maximumContents;
-            Contents = new List<CelestialBodies.CelestialBody>();
-            LargestBody = CelestialBodyType.Planet;
+            Contents = new List<Vector4>();
 
             Top = top;
             Bottom = bottom;
             Left = left;
             Right = right;
+            Rect = new Rect(Left, Bottom, Width, Height);
         }
 
         public void InsertAll(List<CelestialBodies.CelestialBody> bodies)
@@ -72,6 +72,11 @@ namespace MapRendering
 
         public void Insert(CelestialBodies.CelestialBody body)
         {
+            Insert(new Vector4(body.Position.x, body.Position.y, body.Radius, 0));
+        }
+
+        private void Insert(Vector4 body)
+        {
             if (QuadOne == null)
             {
                 if (Contents.Count >= MaximumContents)
@@ -81,7 +86,7 @@ namespace MapRendering
                 }
                 else
                 {
-                    FinalizeInsert(body);
+                    Contents.Add(body);
                 }
             }
             else if (QuadOne.Contains(body))
@@ -102,14 +107,8 @@ namespace MapRendering
             }
             else
             {
-                FinalizeInsert(body);
+                Contents.Add(body);
             }
-        }
-
-        private void FinalizeInsert(CelestialBodies.CelestialBody body)
-        {
-            LargestBody = (CelestialBodyType)Mathf.Max((int)LargestBody, (int)body.Type);
-            Contents.Add(body);
         }
 
         private void Split()
@@ -119,80 +118,68 @@ namespace MapRendering
             QuadThree = new Quadtree(VerticalMedian, Bottom, Left, HorizontalMedian, MaximumContents);
             QuadFour = new Quadtree(VerticalMedian, Bottom, HorizontalMedian, Right, MaximumContents);
 
-            List<CelestialBodies.CelestialBody> toInstert = Contents;
-            Contents = new List<CelestialBodies.CelestialBody>();
-            foreach (CelestialBodies.CelestialBody body in toInstert)
+            List<Vector4> toInstert = Contents;
+            Contents = new List<Vector4>();
+            foreach (Vector4 body in toInstert)
             {
                 Insert(body);
             }
         }
 
-        private bool Contains(CelestialBodies.CelestialBody body)
+        private bool Contains(Vector4 body)
         {
-            float top = body.Position.y + body.Radius;
-            float bottom = body.Position.y - body.Radius;
-            float left = body.Position.x - body.Radius;
-            float right = body.Position.x + body.Radius;
+            float top = body.y + body.z;
+            float bottom = body.y - body.z;
+            float left = body.x - body.z;
+            float right = body.x + body.z;
             return (top < Top && bottom > Bottom && left > Left && right < Right);
-        }
-
-        private bool Contains(Vector2 position)
-        {
-            return position.y < Top && position.y > Bottom && position.x > Left && position.x < Right;
         }
 
         /// <summary>
         /// Get all bodies who's rect overlaps with the provided worldRect (Cull).
-        /// Disregards all bodies smaller than the provided minimum (LoD).
         /// </summary>
         /// <param name="worldRect"></param>
         /// <param name="minimumSize"></param>
         /// <returns></returns>
-        public List<CelestialBodies.CelestialBody> GetLocalBodies(Rect worldRect, CelestialBodyType minimumSize)
+        public void GetLocalBodies(Rect worldRect, Vector4[] output, int offset, ref int index)
         {
-            List<CelestialBodies.CelestialBody> list = new List<CelestialBodies.CelestialBody>();
-
-            Rect rect;
-            foreach (CelestialBodies.CelestialBody celestialBody in Contents)
+            foreach (Vector4 celestialBody in Contents)
             {
-                if (celestialBody.Type >= minimumSize)
+                float top = celestialBody.y + celestialBody.z;
+                float bottom = celestialBody.y - celestialBody.z;
+                float left = celestialBody.x - celestialBody.z;
+                float right = celestialBody.x + celestialBody.z;
+                if (top > worldRect.yMin && bottom < worldRect.yMax && left < worldRect.xMax && right > worldRect.xMin)
                 {
-                    rect = new Rect(celestialBody.Position.x - celestialBody.Radius,
-                        celestialBody.Position.y - celestialBody.Radius,
-                        celestialBody.Radius * 2,
-                        celestialBody.Radius * 2);
-                    if (rect.Overlaps(worldRect))
+                    if (index < 100)
                     {
-                        list.Add(celestialBody);
+                        output[offset + index++] = celestialBody;
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
             }
-
             if (QuadOne != null)
             {
-                rect = new Rect(QuadOne.Left, QuadOne.Bottom, QuadOne.Width, QuadOne.Height);
-                if (rect.Overlaps(worldRect) && QuadOne.LargestBody >= minimumSize)
+                if (QuadOne.Rect.Overlaps(worldRect))
                 {
-                    list.AddRange(QuadOne.GetLocalBodies(worldRect, minimumSize));
+                    QuadOne.GetLocalBodies(worldRect, output, offset, ref index);
                 }
-                rect = new Rect(QuadTwo.Left, QuadTwo.Bottom, QuadTwo.Width, QuadTwo.Height);
-                if (rect.Overlaps(worldRect) && QuadTwo.LargestBody >= minimumSize)
+                if (QuadTwo.Rect.Overlaps(worldRect))
                 {
-                    list.AddRange(QuadTwo.GetLocalBodies(worldRect, minimumSize));
+                    QuadTwo.GetLocalBodies(worldRect, output, offset, ref index);
                 }
-                rect = new Rect(QuadThree.Left, QuadThree.Bottom, QuadThree.Width, QuadThree.Height);
-                if (rect.Overlaps(worldRect) && QuadThree.LargestBody >= minimumSize)
+                if (QuadThree.Rect.Overlaps(worldRect))
                 {
-                    list.AddRange(QuadThree.GetLocalBodies(worldRect, minimumSize));
+                    QuadThree.GetLocalBodies(worldRect, output, offset, ref index);
                 }
-                rect = new Rect(QuadFour.Left, QuadFour.Bottom, QuadFour.Width, QuadFour.Height);
-                if (rect.Overlaps(worldRect) && QuadFour.LargestBody >= minimumSize)
+                if (QuadFour.Rect.Overlaps(worldRect))
                 {
-                    list.AddRange(QuadFour.GetLocalBodies(worldRect, minimumSize));
+                    QuadFour.GetLocalBodies(worldRect, output, offset, ref index);
                 }
             }
-
-            return list;
         }
 
         /// <summary>

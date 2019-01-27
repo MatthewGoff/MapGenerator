@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.IO;
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -10,14 +12,21 @@ public class GameManager : MonoBehaviour
     public GameObject MapRenderer;
 
     private float TimeStamp;
-    private readonly CelestialBodyType MapSize = CelestialBodyType.SolarSystem;
+    private readonly CelestialBodyType MapSize = CelestialBodyType.Universe;
     private CelestialBodies.CelestialBody Map;
 
     private void Awake()
     {
         Instance = this;
+        //CreateWorld();
+        temp();
+    }
 
-        CreateWorld();
+    private void temp()
+    {
+        LoadMap();
+        MapRenderer.GetComponent<MapRendering.MapRenderer>().Initialize(Map);
+        MapRenderer.GetComponent<MapRendering.MapRenderer>().OpenMap();
     }
 
     public void Update()
@@ -32,8 +41,8 @@ public class GameManager : MonoBehaviour
     private void CreateWorld()
     {
         System.Random rng = new System.Random();
-        int seed = 1216466133;
-        // int seed = rng.Next();
+        // int seed = 1216466133;
+        int seed = rng.Next();
         rng = new System.Random(seed);
         Debug.Log("Seed = " + seed);
 
@@ -58,9 +67,48 @@ public class GameManager : MonoBehaviour
         Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
         CreateMap(map);
+        SaveMap();
 
         MapRenderer.GetComponent<MapRendering.MapRenderer>().Initialize(Map);
         MapRenderer.GetComponent<MapRendering.MapRenderer>().OpenMap();
+    }
+
+    private void SaveMap()
+    {
+        Util.LinkedList<byte> linkedList = Map.Serialize();
+        byte[] bytes = new byte[linkedList.Length];
+        int i = 0;
+        foreach (byte b in linkedList)
+        {
+            bytes[i++] = b;
+        }
+        File.WriteAllBytes("MapInfo.dat", bytes);
+    }
+
+    private void LoadMap()
+    {
+        byte[] bytes = File.ReadAllBytes("MapInfo.dat");
+        CelestialBodyType type = (CelestialBodyType)BitConverter.ToInt32(bytes, 4);
+        if (type == CelestialBodyType.Universe)
+        {
+            Map = new CelestialBodies.Universe(bytes, 0);
+        }
+        else if (type == CelestialBodyType.Expanse)
+        {
+            Map = new CelestialBodies.Expanse(bytes, 0);
+        }
+        else if (type == CelestialBodyType.Galaxy)
+        {
+            Map = new CelestialBodies.Galaxy(bytes, 0);
+        }
+        else if (type == CelestialBodyType.Sector)
+        {
+            Map = new CelestialBodies.Sector(bytes, 0);
+        }
+        else
+        {
+            Map = new CelestialBodies.SolarSystem(bytes, 0);
+        }
     }
 
     private void CreateMap(MapGenerator.Containers.Container map)

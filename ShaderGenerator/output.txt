@@ -1,0 +1,401 @@
+
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx0y0, numberOfPlanetsx0y0);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx0y1, numberOfPlanetsx0y1);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx0y2, numberOfPlanetsx0y2);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx0y3, numberOfPlanetsx0y3);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx0y4, numberOfPlanetsx0y4);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx0y5, numberOfPlanetsx0y5);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx0y6, numberOfPlanetsx0y6);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx0y7, numberOfPlanetsx0y7);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx0y8, numberOfPlanetsx0y8);
+}
+else if (fragInput.screenPos.x >= 0.0 && fragInput.screenPos.x <= 0.1 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx0y9, numberOfPlanetsx0y9);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx1y0, numberOfPlanetsx1y0);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx1y1, numberOfPlanetsx1y1);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx1y2, numberOfPlanetsx1y2);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx1y3, numberOfPlanetsx1y3);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx1y4, numberOfPlanetsx1y4);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx1y5, numberOfPlanetsx1y5);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx1y6, numberOfPlanetsx1y6);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx1y7, numberOfPlanetsx1y7);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx1y8, numberOfPlanetsx1y8);
+}
+else if (fragInput.screenPos.x >= 0.1 && fragInput.screenPos.x <= 0.2 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx1y9, numberOfPlanetsx1y9);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx2y0, numberOfPlanetsx2y0);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx2y1, numberOfPlanetsx2y1);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx2y2, numberOfPlanetsx2y2);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx2y3, numberOfPlanetsx2y3);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx2y4, numberOfPlanetsx2y4);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx2y5, numberOfPlanetsx2y5);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx2y6, numberOfPlanetsx2y6);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx2y7, numberOfPlanetsx2y7);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx2y8, numberOfPlanetsx2y8);
+}
+else if (fragInput.screenPos.x >= 0.2 && fragInput.screenPos.x <= 0.3 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx2y9, numberOfPlanetsx2y9);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx3y0, numberOfPlanetsx3y0);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx3y1, numberOfPlanetsx3y1);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx3y2, numberOfPlanetsx3y2);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx3y3, numberOfPlanetsx3y3);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx3y4, numberOfPlanetsx3y4);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx3y5, numberOfPlanetsx3y5);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx3y6, numberOfPlanetsx3y6);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx3y7, numberOfPlanetsx3y7);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx3y8, numberOfPlanetsx3y8);
+}
+else if (fragInput.screenPos.x >= 0.3 && fragInput.screenPos.x <= 0.4 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx3y9, numberOfPlanetsx3y9);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx4y0, numberOfPlanetsx4y0);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx4y1, numberOfPlanetsx4y1);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx4y2, numberOfPlanetsx4y2);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx4y3, numberOfPlanetsx4y3);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx4y4, numberOfPlanetsx4y4);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx4y5, numberOfPlanetsx4y5);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx4y6, numberOfPlanetsx4y6);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx4y7, numberOfPlanetsx4y7);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx4y8, numberOfPlanetsx4y8);
+}
+else if (fragInput.screenPos.x >= 0.4 && fragInput.screenPos.x <= 0.5 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx4y9, numberOfPlanetsx4y9);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx5y0, numberOfPlanetsx5y0);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx5y1, numberOfPlanetsx5y1);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx5y2, numberOfPlanetsx5y2);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx5y3, numberOfPlanetsx5y3);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx5y4, numberOfPlanetsx5y4);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx5y5, numberOfPlanetsx5y5);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx5y6, numberOfPlanetsx5y6);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx5y7, numberOfPlanetsx5y7);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx5y8, numberOfPlanetsx5y8);
+}
+else if (fragInput.screenPos.x >= 0.5 && fragInput.screenPos.x <= 0.6 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx5y9, numberOfPlanetsx5y9);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx6y0, numberOfPlanetsx6y0);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx6y1, numberOfPlanetsx6y1);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx6y2, numberOfPlanetsx6y2);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx6y3, numberOfPlanetsx6y3);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx6y4, numberOfPlanetsx6y4);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx6y5, numberOfPlanetsx6y5);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx6y6, numberOfPlanetsx6y6);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx6y7, numberOfPlanetsx6y7);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx6y8, numberOfPlanetsx6y8);
+}
+else if (fragInput.screenPos.x >= 0.6 && fragInput.screenPos.x <= 0.7 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx6y9, numberOfPlanetsx6y9);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx7y0, numberOfPlanetsx7y0);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx7y1, numberOfPlanetsx7y1);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx7y2, numberOfPlanetsx7y2);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx7y3, numberOfPlanetsx7y3);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx7y4, numberOfPlanetsx7y4);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx7y5, numberOfPlanetsx7y5);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx7y6, numberOfPlanetsx7y6);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx7y7, numberOfPlanetsx7y7);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx7y8, numberOfPlanetsx7y8);
+}
+else if (fragInput.screenPos.x >= 0.7 && fragInput.screenPos.x <= 0.8 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx7y9, numberOfPlanetsx7y9);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx8y0, numberOfPlanetsx8y0);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx8y1, numberOfPlanetsx8y1);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx8y2, numberOfPlanetsx8y2);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx8y3, numberOfPlanetsx8y3);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx8y4, numberOfPlanetsx8y4);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx8y5, numberOfPlanetsx8y5);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx8y6, numberOfPlanetsx8y6);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx8y7, numberOfPlanetsx8y7);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx8y8, numberOfPlanetsx8y8);
+}
+else if (fragInput.screenPos.x >= 0.8 && fragInput.screenPos.x <= 0.9 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx8y9, numberOfPlanetsx8y9);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.0 && fragInput.screenPos.y <= 0.1)
+{
+	color = fragHelper(fragInput, planetsx9y0, numberOfPlanetsx9y0);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.1 && fragInput.screenPos.y <= 0.2)
+{
+	color = fragHelper(fragInput, planetsx9y1, numberOfPlanetsx9y1);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.2 && fragInput.screenPos.y <= 0.3)
+{
+	color = fragHelper(fragInput, planetsx9y2, numberOfPlanetsx9y2);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.3 && fragInput.screenPos.y <= 0.4)
+{
+	color = fragHelper(fragInput, planetsx9y3, numberOfPlanetsx9y3);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.4 && fragInput.screenPos.y <= 0.5)
+{
+	color = fragHelper(fragInput, planetsx9y4, numberOfPlanetsx9y4);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.5 && fragInput.screenPos.y <= 0.6)
+{
+	color = fragHelper(fragInput, planetsx9y5, numberOfPlanetsx9y5);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.6 && fragInput.screenPos.y <= 0.7)
+{
+	color = fragHelper(fragInput, planetsx9y6, numberOfPlanetsx9y6);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.7 && fragInput.screenPos.y <= 0.8)
+{
+	color = fragHelper(fragInput, planetsx9y7, numberOfPlanetsx9y7);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.8 && fragInput.screenPos.y <= 0.9)
+{
+	color = fragHelper(fragInput, planetsx9y8, numberOfPlanetsx9y8);
+}
+else if (fragInput.screenPos.x >= 0.9 && fragInput.screenPos.x <= 1.0 && fragInput.screenPos.y >= 0.9 && fragInput.screenPos.y <= 1.0)
+{
+	color = fragHelper(fragInput, planetsx9y9, numberOfPlanetsx9y9);
+}

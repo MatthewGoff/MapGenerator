@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
@@ -30,5 +29,39 @@ public class CameraController : MonoBehaviour
         float y = transform.position.y - height / 2f;
         float x = transform.position.x - width / 2f;
         return new Rect(x, y, width, height);
+    }
+
+    public float GetPixelWidth()
+    {
+        Camera camera = GetComponent<Camera>();
+        return camera.pixelHeight / (2 * camera.orthographicSize);
+    }
+
+    private void OnPostRender()
+    {
+        //DrawSegments();
+    }
+
+    private void DrawSegments()
+    {
+        Rect rect = GetCameraRect();
+        float horizontalSpacing = rect.width / 16;
+        float verticalSpacing = rect.height / 9;
+
+        Material lineMat = new Material(Shader.Find("Sprites/Default"));
+        GL.Begin(GL.LINES);
+        lineMat.SetPass(0);
+        GL.Color(new Color(1f, 0f, 0f, 1f));
+        for (int column = 0; column < 16; column++)
+        {
+            GL.Vertex3(column * horizontalSpacing + rect.xMin, rect.yMin, 0);
+            GL.Vertex3(column * horizontalSpacing + rect.xMin, rect.yMax, 0);
+        }
+        for (int row = 0; row < 9; row++)
+        {
+            GL.Vertex3(rect.xMin, row * verticalSpacing + rect.yMin, 0);
+            GL.Vertex3(rect.xMax, row * verticalSpacing + rect.yMin, 0);
+        }
+        GL.End();
     }
 }

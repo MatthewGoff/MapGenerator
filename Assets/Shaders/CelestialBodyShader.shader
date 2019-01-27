@@ -26,7 +26,8 @@
 			#define QUALITY_LEVEL 2
 
 			sampler2D _MainTex;
-			float4 bodies[1000];
+			float4 bodies[10];
+			float numberOfBodies;
 			fixed4 _ExternalColor;
 			fixed4 _InternalColor;
 
@@ -65,19 +66,29 @@
 
 			fixed4 frag(fragmentInput fragInput) : SV_Target
 			{
+				fixed4 returnColor = fixed4(0, 0, 0, 0);
 				[loop]
-				for (int i = 0; i < 100; i++)
+				for (int i = 0; i < 10; i++)
 				{
-					float distance = sqrt(pow(fragInput.worldPos.x - bodies[i].x, 2) + pow(fragInput.worldPos.y - bodies[i].y,2));
-					fixed alpha = AntiAliasing(distance, bodies[i].z);
-					if (alpha > 0)
+					float4 body;
+					if (i < numberOfBodies)
 					{
-						float ratio = distance / bodies[i].z;
+						body = bodies[i];
+					}
+					else
+					{
+						body = fixed4(0, 0, 0, 0);
+					}
+					float distance = sqrt(pow(fragInput.worldPos.x - body.x, 2) + pow(fragInput.worldPos.y - body.y,2));
+					fixed alpha = AntiAliasing(distance, body.z);
+					if (alpha > returnColor.a)
+					{
+						float ratio = distance / body.z;
 						fixed4 color = lerp(_InternalColor, _ExternalColor, ratio);
-						return fixed4(color.rgb, alpha);
+						returnColor = fixed4(color.rgb, alpha);
 					}
 				}
-				return fixed4(0, 0, 0, 0);
+				return returnColor;
 			}
 
 			ENDCG

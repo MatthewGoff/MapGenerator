@@ -6,5 +6,10 @@
         {
 
         }
+
+        public SolarSystem(byte[] bytes, int startIndex) : base(bytes, startIndex)
+        {
+
+        }
     }
 }
