@@ -18,8 +18,8 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        //CreateWorld();
-        temp();
+        CreateWorld();
+        //temp();
     }
 
     private void temp()
@@ -31,11 +31,7 @@ public class GameManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            MapGenScreen.SetActive(!MapGenScreen.activeSelf);
-        }
-        Debug.Log(1f/Time.deltaTime);
+        //Debug.Log(1f/Time.deltaTime);
     }
 
     private void CreateWorld()
@@ -71,6 +67,8 @@ public class GameManager : MonoBehaviour
 
         MapRenderer.GetComponent<MapRendering.MapRenderer>().Initialize(Map);
         MapRenderer.GetComponent<MapRendering.MapRenderer>().OpenMap();
+
+        MapGenScreen.SetActive(false);
     }
 
     private void SaveMap()

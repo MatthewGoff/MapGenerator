@@ -6,83 +6,163 @@ namespace MapRendering
 {
     public class MapRenderer : MonoBehaviour
     {
-        private static readonly int MAX_OBJECTS_PER_SHADER = 100;
-        private static readonly int COLUMNS_PER_SHADER = 3;
-        private static readonly int ROWS_PER_SHADER = 3;
-        private static readonly int SPRITE_COLUMNS = 6;
-        private static readonly int SPRITE_ROWS = 3;
+        private static readonly float LOD0to1_THRESHOLD = 195;
+        private static readonly float LOD1to2_THRESHOLD = 900;
+        private static readonly float LOD2to3_THRESHOLD = 3000;
+
         public GameObject MapCamera;
 
-        private float LargestPlanet;
-        private float LargestStar;
-        private float LargestSolarSystem;
-        private float LargestSector;
-        private float LargestGalaxy;
-        private float LargestExpanse;
-        private float LargestUniverse;
-
-        private Quadtree PlanetQuadtree;
-        private Vector4[,][] PlanetVectors;
-        private float[,][] NumberOfPlanets;
-        private GameObject[,] PlanetSprites;
+        public GameObject SmallBodyLayer_LOD0;
+        public GameObject SolarSystemLayer_LOD0;
+        public GameObject SolarSystemLayer_LOD1;
+        public GameObject SectorLayer_LOD1;
+        public GameObject SectorLayer_LOD2;
+        public GameObject GalaxyLayer_LOD2;
+        public GameObject GalaxyLayer_LOD3;
+        public GameObject ExpanseLayer_LOD3;
+        public GameObject UniverseLayer_LOD3;
 
         public void Initialize(CelestialBodies.CelestialBody map)
         {
-            InitializePlanetSegments();
-            //InitializeUniverseSegments();
-            InitializeQuadtrees(map);
-            InitializeShaderParameters();
+            MapCamera.GetComponent<CameraController>().Initialize(map.Radius);
+            InitializeSmallBodyLayer(map);
+            InitializeSolarSystemLayers(map);
+            InitializeSectorLayers(map);
+            InitializeGalaxyLayers(map);
+            InitializeExpanseLayer(map);
+            InitializeUniverseLayer(map);
         }
 
-        private void InitializeShaderParameters()
+        private void InitializeSmallBodyLayer(CelestialBodies.CelestialBody map)
         {
-            PlanetVectors = new Vector4[SPRITE_COLUMNS, SPRITE_ROWS][];
-            for (int x = 0; x < PlanetVectors.GetLength(0); x++)
-            {
-                for (int y = 0; y < PlanetVectors.GetLength(1); y++)
-                {
-                    PlanetVectors[x, y] = new Vector4[COLUMNS_PER_SHADER * ROWS_PER_SHADER * MAX_OBJECTS_PER_SHADER];
-                }
-            }
-
-            NumberOfPlanets = new float[SPRITE_COLUMNS, SPRITE_ROWS][];
-            for (int x = 0; x < NumberOfPlanets.GetLength(0); x++)
-            {
-                for (int y = 0; y < NumberOfPlanets.GetLength(1); y++)
-                {
-                    NumberOfPlanets[x, y] = new float[COLUMNS_PER_SHADER * ROWS_PER_SHADER];
-                }
-            }
-        }
-
-        private void InitializeQuadtrees(CelestialBodies.CelestialBody map)
-        {
-            PlanetQuadtree = new Quadtree(map.Radius, -map.Radius, -map.Radius, map.Radius);
-            List<CelestialBodies.Planet> planets = map.GetAllPlanets(ref LargestPlanet);
+            Quadtree quadtree = new Quadtree(map.Radius, -map.Radius, -map.Radius, map.Radius);
+            List<CelestialBodies.Planet> planets = map.GetAllPlanets();
             foreach (CelestialBodies.Planet planet in planets)
             {
-                PlanetQuadtree.Insert(planet);
+                quadtree.Insert(planet);
             }
+            List<CelestialBodies.Star> stars = map.GetAllStars();
+            foreach (CelestialBodies.Star star in stars)
+            {
+                quadtree.Insert(star);
+            }
+            SmallBodyLayer_LOD0.GetComponent<ManyLayerController>().Initialize(quadtree);
         }
 
-        private void InitializePlanetSegments()
+        private void InitializeSolarSystemLayers(CelestialBodies.CelestialBody map)
         {
-            Texture2D texture = (Texture2D)Resources.Load("Sprites/PlanetSprite");
-            Rect rect = new Rect(0, 0, 512, 512);
-
-            PlanetSprites = new GameObject[SPRITE_COLUMNS, SPRITE_ROWS];
-            for (int x = 0; x < PlanetSprites.GetLength(0); x++)
+            Quadtree quadtree = new Quadtree(map.Radius, -map.Radius, -map.Radius, map.Radius);
+            List<CelestialBodies.SolarSystem> solarSystems = map.GetAllSolarSystems();
+            foreach (CelestialBodies.SolarSystem solarSystem in solarSystems)
             {
-                for (int y = 0; y < PlanetSprites.GetLength(1); y++)
-                {
-                    PlanetSprites[x, y] = new GameObject("Planet Sprite ("+x+","+y+")");
-                    PlanetSprites[x, y].transform.SetParent(gameObject.transform);
-                    PlanetSprites[x, y].AddComponent<SpriteRenderer>();
-                    PlanetSprites[x, y].GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, rect, Vector2.zero, 512);
-                    PlanetSprites[x, y].GetComponent<SpriteRenderer>().sortingOrder = 0;
-                    Material material = new Material(Shader.Find("Custom/PlanetShader"));
-                    PlanetSprites[x, y].GetComponent<SpriteRenderer>().material = material;
-                }
+                quadtree.Insert(solarSystem);
+            }
+            SolarSystemLayer_LOD0.GetComponent<ManyLayerController>().Initialize(quadtree);
+            SolarSystemLayer_LOD1.GetComponent<ManyLayerController>().Initialize(quadtree);
+        }
+
+        private void InitializeSectorLayers(CelestialBodies.CelestialBody map)
+        {
+            Quadtree quadtree = new Quadtree(map.Radius, -map.Radius, -map.Radius, map.Radius);
+            List<CelestialBodies.Sector> sectors = map.GetAllSectors();
+            foreach (CelestialBodies.Sector sector in sectors)
+            {
+                quadtree.Insert(sector);
+            }
+            SectorLayer_LOD1.GetComponent<ManyLayerController>().Initialize(quadtree);
+            SectorLayer_LOD2.GetComponent<ManyLayerController>().Initialize(quadtree);
+        }
+
+        private void InitializeGalaxyLayers(CelestialBodies.CelestialBody map)
+        {
+            Quadtree quadtree = new Quadtree(map.Radius, -map.Radius, -map.Radius, map.Radius);
+            List<CelestialBodies.Galaxy> galaxies = map.GetAllGalaxies();
+            foreach (CelestialBodies.Galaxy galaxy in galaxies)
+            {
+                quadtree.Insert(galaxy);
+            }
+            GalaxyLayer_LOD2.GetComponent<ManyLayerController>().Initialize(quadtree);
+            GalaxyLayer_LOD3.GetComponent<ManyLayerController>().Initialize(quadtree);
+        }
+
+        private void InitializeExpanseLayer(CelestialBodies.CelestialBody map)
+        {
+            List<CelestialBodies.CelestialBody> layerList = new List<CelestialBodies.CelestialBody>();
+            foreach(CelestialBodies.Expanse expanse in map.GetAllExpanses())
+            {
+                layerList.Add(expanse);
+            }
+            ExpanseLayer_LOD3.GetComponent<FewLayerController>().Initialize(layerList);
+        }
+
+        private void InitializeUniverseLayer(CelestialBodies.CelestialBody map)
+        {
+            List<CelestialBodies.CelestialBody> layerList = new List<CelestialBodies.CelestialBody>();
+            foreach (CelestialBodies.Universe universe in map.GetAllUniverses())
+            {
+                layerList.Add(universe);
+            }
+            UniverseLayer_LOD3.GetComponent<FewLayerController>().Initialize(layerList);
+        }
+
+        private void Update()
+        {
+            float cameraSize = MapCamera.GetComponent<Camera>().orthographicSize;
+            if (cameraSize <= LOD0to1_THRESHOLD)
+            {
+                SmallBodyLayer_LOD0.SetActive(true);
+                SolarSystemLayer_LOD0.SetActive(true);
+                SolarSystemLayer_LOD1.SetActive(false);
+                SectorLayer_LOD1.SetActive(true);
+                SectorLayer_LOD2.SetActive(false);
+                GalaxyLayer_LOD2.SetActive(true);
+                GalaxyLayer_LOD3.SetActive(false);
+                ExpanseLayer_LOD3.SetActive(true);
+                UniverseLayer_LOD3.SetActive(true);
+                MapCamera.GetComponent<CameraController>().DisplaySmallGrid = false;
+                MapCamera.GetComponent<CameraController>().DisplayLargeGrid = false;
+            }
+            else if (cameraSize <= LOD1to2_THRESHOLD)
+            {
+                SmallBodyLayer_LOD0.SetActive(false);
+                SolarSystemLayer_LOD0.SetActive(false);
+                SolarSystemLayer_LOD1.SetActive(true);
+                SectorLayer_LOD1.SetActive(true);
+                SectorLayer_LOD2.SetActive(false);
+                GalaxyLayer_LOD2.SetActive(true);
+                GalaxyLayer_LOD3.SetActive(false);
+                ExpanseLayer_LOD3.SetActive(true);
+                UniverseLayer_LOD3.SetActive(true);
+                MapCamera.GetComponent<CameraController>().DisplaySmallGrid = false;
+                MapCamera.GetComponent<CameraController>().DisplayLargeGrid = false;
+            }
+            else if (cameraSize <= LOD2to3_THRESHOLD)
+            {
+                SmallBodyLayer_LOD0.SetActive(false);
+                SolarSystemLayer_LOD0.SetActive(false);
+                SolarSystemLayer_LOD1.SetActive(false);
+                SectorLayer_LOD1.SetActive(false);
+                SectorLayer_LOD2.SetActive(true);
+                GalaxyLayer_LOD2.SetActive(true);
+                GalaxyLayer_LOD3.SetActive(false);
+                ExpanseLayer_LOD3.SetActive(true);
+                UniverseLayer_LOD3.SetActive(true);
+                MapCamera.GetComponent<CameraController>().DisplaySmallGrid = false;
+                MapCamera.GetComponent<CameraController>().DisplayLargeGrid = false;
+            }
+            else
+            {
+                SmallBodyLayer_LOD0.SetActive(false);
+                SolarSystemLayer_LOD0.SetActive(false);
+                SolarSystemLayer_LOD1.SetActive(false);
+                SectorLayer_LOD1.SetActive(false);
+                SectorLayer_LOD2.SetActive(false);
+                GalaxyLayer_LOD2.SetActive(false);
+                GalaxyLayer_LOD3.SetActive(true);
+                ExpanseLayer_LOD3.SetActive(true);
+                UniverseLayer_LOD3.SetActive(true);
+                MapCamera.GetComponent<CameraController>().DisplaySmallGrid = false;
+                MapCamera.GetComponent<CameraController>().DisplayLargeGrid = true;
             }
         }
 
@@ -94,43 +174,6 @@ namespace MapRendering
         public void CloseMap()
         {
             gameObject.SetActive(false);
-        }
-
-        private void LateUpdate()
-        {
-            UpdatePlanetSegments();
-        }
-
-        private void UpdatePlanetSegments()
-        {
-            Rect rect = MapCamera.GetComponent<CameraController>().GetCameraRect();
-            float pixelWidth = MapCamera.GetComponent<CameraController>().GetPixelWidth();
-            Rect[,] spriteRects = Helpers.SubdivideRect(rect, SPRITE_COLUMNS, SPRITE_ROWS);
-
-            for (int spriteColumn = 0; spriteColumn < SPRITE_COLUMNS; spriteColumn++)
-            {
-                for (int spriteRow = 0; spriteRow < SPRITE_ROWS; spriteRow++)
-                {
-                    PlanetSprites[spriteColumn, spriteRow].transform.position = spriteRects[spriteColumn, spriteRow].min;
-                    PlanetSprites[spriteColumn, spriteRow].transform.localScale = spriteRects[spriteColumn, spriteRow].size;
-                    Rect[,] shaderRects = Helpers.SubdivideRect(spriteRects[spriteColumn, spriteRow], COLUMNS_PER_SHADER, ROWS_PER_SHADER);
-
-                    for (int shaderColumn = 0; shaderColumn < COLUMNS_PER_SHADER; shaderColumn++)
-                    {
-                        for (int shaderRow = 0; shaderRow < ROWS_PER_SHADER; shaderRow++)
-                        {
-                            int offset = ROWS_PER_SHADER * shaderColumn + shaderRow;
-                            int count = 0;
-                            PlanetQuadtree.GetLocalBodies(shaderRects[shaderColumn, shaderRow], PlanetVectors[spriteColumn, spriteRow], MAX_OBJECTS_PER_SHADER * offset, ref count);
-                            NumberOfPlanets[spriteColumn, spriteRow][offset] = count;
-                        }
-                    }
-
-                    PlanetSprites[spriteColumn, spriteRow].GetComponent<SpriteRenderer>().material.SetVectorArray("planets", PlanetVectors[spriteColumn, spriteRow]);
-                    PlanetSprites[spriteColumn, spriteRow].GetComponent<SpriteRenderer>().material.SetFloatArray("numberOfPlanets", NumberOfPlanets[spriteColumn, spriteRow]);
-                    PlanetSprites[spriteColumn, spriteRow].GetComponent<SpriteRenderer>().material.SetFloat("pixelWidth", pixelWidth);
-                }
-            }
         }
     }
 }

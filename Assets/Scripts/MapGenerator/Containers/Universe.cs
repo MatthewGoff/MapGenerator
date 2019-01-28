@@ -63,7 +63,9 @@ namespace MapGenerator.Containers
             StartActivity("Distributing Stars");
             Distribute(false, true);
             EndActivity();
+            StartActivity("Finalizing");
             FinalizeContainer();
+            EndActivity();
             ProgressTracker.Instance.UniverseInitialized();
         }
     }

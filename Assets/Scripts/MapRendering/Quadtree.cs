@@ -72,7 +72,7 @@ namespace MapRendering
 
         public void Insert(CelestialBodies.CelestialBody body)
         {
-            Insert(new Vector4(body.Position.x, body.Position.y, body.Radius, 0));
+            Insert(new Vector4(body.Position.x, body.Position.y, body.Radius, (int)body.Type));
         }
 
         private void Insert(Vector4 body)

@@ -123,7 +123,7 @@ namespace CelestialBodies
             }
         }
 
-        public List<Planet> GetAllPlanets(ref float largestPlanet)
+        public List<Planet> GetAllPlanets()
         {
             List<Planet> planets = new List<Planet>();
 
@@ -131,42 +131,41 @@ namespace CelestialBodies
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
-                    planets.AddRange(Expanses[i].GetAllPlanets(ref largestPlanet));
+                    planets.AddRange(Expanses[i].GetAllPlanets());
                 }
             }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
                 {
-                    planets.AddRange(Galaxies[i].GetAllPlanets(ref largestPlanet));
+                    planets.AddRange(Galaxies[i].GetAllPlanets());
                 }
             }
             if (Sectors != null)
             {
                 for (int i = 0; i < Sectors.Length; i++)
                 {
-                    planets.AddRange(Sectors[i].GetAllPlanets(ref largestPlanet));
+                    planets.AddRange(Sectors[i].GetAllPlanets());
                 }
             }
             if (SolarSystems != null)
             {
                 for (int i = 0; i < SolarSystems.Length; i++)
                 {
-                    planets.AddRange(SolarSystems[i].GetAllPlanets(ref largestPlanet));
+                    planets.AddRange(SolarSystems[i].GetAllPlanets());
                 }
             }
             if (Planets != null)
             {
                 for (int i = 0; i < Planets.Length; i++)
                 {
-                    largestPlanet = Mathf.Max(largestPlanet, Planets[i].Radius);
                     planets.Add(Planets[i]);
                 }
             }
             return planets;
         }
 
-        public List<Star> GetAllStars(ref float largestStar)
+        public List<Star> GetAllStars()
         {
             List<Star> stars = new List<Star>();
 
@@ -174,165 +173,155 @@ namespace CelestialBodies
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
-                    stars.AddRange(Expanses[i].GetAllStars(ref largestStar));
+                    stars.AddRange(Expanses[i].GetAllStars());
                 }
             }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
                 {
-                    stars.AddRange(Galaxies[i].GetAllStars(ref largestStar));
+                    stars.AddRange(Galaxies[i].GetAllStars());
                 }
             }
             if (Sectors != null)
             {
                 for (int i = 0; i < Sectors.Length; i++)
                 {
-                    stars.AddRange(Sectors[i].GetAllStars(ref largestStar));
+                    stars.AddRange(Sectors[i].GetAllStars());
                 }
             }
             if (SolarSystems != null)
             {
                 for (int i = 0; i < SolarSystems.Length; i++)
                 {
-                    stars.AddRange(SolarSystems[i].GetAllStars(ref largestStar));
+                    stars.AddRange(SolarSystems[i].GetAllStars());
                 }
             }
             if (Stars != null)
             {
                 for (int i = 0; i < Stars.Length; i++)
                 {
-                    largestStar = Mathf.Max(largestStar, Stars[i].Radius);
                     stars.Add(Stars[i]);
                 }
             }
             return stars;
         }
 
-        public List<SolarSystem> GetAllSolarSystems(ref float largestSolarSystem)
+        public List<SolarSystem> GetAllSolarSystems()
         {
             List<SolarSystem> solarSystems = new List<SolarSystem>();
             if (Type == CelestialBodyType.SolarSystem)
             {
-                largestSolarSystem = Mathf.Max(largestSolarSystem, Radius);
                 solarSystems.Add((SolarSystem)this);
             }
             if (Expanses != null)
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
-                    solarSystems.AddRange(Expanses[i].GetAllSolarSystems(ref largestSolarSystem));
+                    solarSystems.AddRange(Expanses[i].GetAllSolarSystems());
                 }
             }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
                 {
-                    solarSystems.AddRange(Galaxies[i].GetAllSolarSystems(ref largestSolarSystem));
+                    solarSystems.AddRange(Galaxies[i].GetAllSolarSystems());
                 }
             }
             if (Sectors != null)
             {
                 for (int i = 0; i < Sectors.Length; i++)
                 {
-                    solarSystems.AddRange(Sectors[i].GetAllSolarSystems(ref largestSolarSystem));
+                    solarSystems.AddRange(Sectors[i].GetAllSolarSystems());
                 }
             }
             if (SolarSystems != null)
             {
                 for (int i = 0; i < SolarSystems.Length; i++)
                 {
-                    largestSolarSystem = Mathf.Max(largestSolarSystem, SolarSystems[i].Radius);
                     solarSystems.Add(SolarSystems[i]);
                 }
             }
             return solarSystems;
         }
 
-        public List<Sector> GetAllSectors(ref float largestSector)
+        public List<Sector> GetAllSectors()
         {
             List<Sector> sectors = new List<Sector>();
             if (Type == CelestialBodyType.Sector)
             {
-                largestSector = Mathf.Max(largestSector, Radius);
                 sectors.Add((Sector)this);
             }
             if (Expanses != null)
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
-                    sectors.AddRange(Expanses[i].GetAllSectors(ref largestSector));
+                    sectors.AddRange(Expanses[i].GetAllSectors());
                 }
             }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
                 {
-                    sectors.AddRange(Galaxies[i].GetAllSectors(ref largestSector));
+                    sectors.AddRange(Galaxies[i].GetAllSectors());
                 }
             }
             if (Sectors != null)
             {
                 for (int i = 0; i < Sectors.Length; i++)
                 {
-                    largestSector = Mathf.Max(largestSector, Sectors[i].Radius);
                     sectors.Add(Sectors[i]);
                 }
             }
             return sectors;
         }
 
-        public List<Galaxy> GetAllGalaxies(ref float largestGalaxy)
+        public List<Galaxy> GetAllGalaxies()
         {
             List<Galaxy> galaxies = new List<Galaxy>();
             if (Type == CelestialBodyType.Galaxy)
             {
-                largestGalaxy = Mathf.Max(largestGalaxy, Radius);
                 galaxies.Add((Galaxy)this);
             }
             if (Expanses != null)
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
-                    galaxies.AddRange(Expanses[i].GetAllGalaxies(ref largestGalaxy));
+                    galaxies.AddRange(Expanses[i].GetAllGalaxies());
                 }
             }
             if (Galaxies != null)
             {
                 for (int i = 0; i < Galaxies.Length; i++)
                 {
-                    largestGalaxy = Mathf.Max(largestGalaxy, Galaxies[i].Radius);
                     galaxies.Add(Galaxies[i]);
                 }
             }
             return galaxies;
         }
 
-        public List<Expanse> GetAllExpanses(ref float largestExpanse)
+        public List<Expanse> GetAllExpanses()
         {
             List<Expanse> expanses = new List<Expanse>();
             if (Type == CelestialBodyType.Expanse)
             {
-                largestExpanse = Mathf.Max(largestExpanse, Radius);
                 expanses.Add((Expanse)this);
             }
             if (Expanses != null)
             {
                 for (int i = 0; i < Expanses.Length; i++)
                 {
-                    largestExpanse = Mathf.Max(largestExpanse, Expanses[i].Radius);
                     expanses.Add(Expanses[i]);
                 }
             }
             return expanses;
         }
 
-        public List<Universe> GetAllUniverses(ref float largestUniverse)
+        public List<Universe> GetAllUniverses()
         {
             List<Universe> universes = new List<Universe>();
             if (Type == CelestialBodyType.Universe)
             {
-                largestUniverse = Mathf.Max(largestUniverse, Radius);
                 universes.Add((Universe)this);
             }
             return universes;
