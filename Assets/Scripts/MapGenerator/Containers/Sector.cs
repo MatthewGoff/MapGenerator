@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_SOLAR_SYSTEMS = 20;
         public static readonly float MAX_RADIUS = SolarSystem.MAX_RADIUS * 4;
 
-        public Sector(int randomSeed, bool root) : base(CelestialBodyType.Sector, 1f, randomSeed, MAX_RADIUS, root)
+        public Sector(CelestialBodyIdentifier id, int randomSeed, bool root) : base(CelestialBodyType.Sector, id, 1f, randomSeed, MAX_RADIUS, root)
         {
             int population;
             if (root)

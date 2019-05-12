@@ -9,7 +9,7 @@ public class CameraController : MonoBehaviour
 
     private static readonly float GRID_CURVES = 60;
     private static readonly float GRID_CURVATURE = 0.6f;
-    private static readonly float GRID_STEP = 0.01f;
+    private static readonly float GRID_STEP = 0.05f;
     private static readonly float GRID_DURATION = 6f;
 
     public bool DisplaySmallGrid;
@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour
 
     public void Initialize(float radius)
     {
-        MaxCameraSize = radius;
+        MaxCameraSize = 1.25f * radius;
         MaxCameraDistance = radius;
         InitializeGrids(radius);
     }

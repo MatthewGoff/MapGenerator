@@ -6,6 +6,7 @@ namespace CelestialBodies
 {
     public abstract class CelestialBody
     {
+        public readonly CelestialBodyIdentifier ID;
         public readonly CelestialBodyType Type;
         public readonly Vector2 Position;
         public readonly float Radius;
@@ -17,11 +18,18 @@ namespace CelestialBodies
         public readonly Star[] Stars;
         public readonly Planet[] Planets;
 
+        /// <summary>
+        /// Deserialization Constructor
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="startIndex"></param>
         protected CelestialBody(byte[] bytes, int startIndex)
         {
             int offset = 4;
             Type = (CelestialBodyType)BitConverter.ToInt32(bytes, startIndex + offset);
             offset += 4;
+            ID = new CelestialBodyIdentifier(bytes, startIndex + offset);
+            offset += BitConverter.ToInt32(bytes, startIndex + offset);
             float x = BitConverter.ToSingle(bytes, startIndex + offset);
             offset += 4;
             float y = BitConverter.ToSingle(bytes, startIndex + offset);
@@ -45,6 +53,7 @@ namespace CelestialBodies
 
         protected CelestialBody(MapGenerator.Containers.Container container)
         {
+            ID = container.ID;
             Type = container.Type;
             Position = container.GlobalPosition;
             Radius = container.Radius;
@@ -121,6 +130,48 @@ namespace CelestialBodies
             {
                 Planets = new Planet[0];
             }
+        }
+
+        public CelestialBody GetCelestialBody(CelestialBodyIdentifier id)
+        {
+            for (int i = CelestialBodyIdentifier.LargestCelestialBodyType(); i >= (int)Type; i--)
+            {
+                if (ID.Address[(CelestialBodyType)i] != id.Address[(CelestialBodyType)i])
+                {
+                    Debug.Log("bad address: " + id.ToString() + " in " + ID.ToString());
+                    return null;
+                }
+            }
+
+            if (ID.Type == id.Type)
+            {
+                return this;
+            }
+
+            for (int i = (int)Type - 1; i >= (int)id.Type; i--)
+            {
+                CelestialBodyType type = (CelestialBodyType)i;
+                if (id.Address[type] != -1)
+                {
+                    switch (type)
+                    {
+                        case CelestialBodyType.Expanse:
+                            return Expanses[id.Address[type]].GetCelestialBody(id);
+                        case CelestialBodyType.Galaxy:
+                            return Galaxies[id.Address[type]].GetCelestialBody(id);
+                        case CelestialBodyType.Sector:
+                            return Sectors[id.Address[type]].GetCelestialBody(id);
+                        case CelestialBodyType.SolarSystem:
+                            return SolarSystems[id.Address[type]].GetCelestialBody(id);
+                        case CelestialBodyType.Star:
+                            return Stars[id.Address[type]].GetCelestialBody(id);
+                        case CelestialBodyType.Planet:
+                            return Planets[id.Address[type]].GetCelestialBody(id);
+                    }
+                }
+            }
+
+            return null;
         }
 
         public List<Planet> GetAllPlanets()
@@ -331,10 +382,10 @@ namespace CelestialBodies
         {
             Util.LinkedList<byte> bytes = new Util.LinkedList<byte>();
             bytes.Append(BitConverter.GetBytes((int)Type));
+            bytes.Append(ID.Serialize());
             bytes.Append(BitConverter.GetBytes(Position.x));
             bytes.Append(BitConverter.GetBytes(Position.y));
             bytes.Append(BitConverter.GetBytes(Radius));
-
             bytes.Append(SerializeCelestialBodies(Expanses));
             bytes.Append(SerializeCelestialBodies(Galaxies));
             bytes.Append(SerializeCelestialBodies(Sectors));

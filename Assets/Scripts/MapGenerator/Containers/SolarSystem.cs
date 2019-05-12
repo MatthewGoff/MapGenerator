@@ -8,9 +8,10 @@ namespace MapGenerator.Containers
         private static readonly int MAX_PLANETS = 20;
         public static readonly float MAX_RADIUS = Planet.MAX_RADIUS * 10;
 
-        public SolarSystem(int randomSeed, bool root) : base(CelestialBodyType.SolarSystem, 5f, randomSeed, MAX_RADIUS, root)
+        public SolarSystem(CelestialBodyIdentifier id, int randomSeed, bool root) : base(CelestialBodyType.SolarSystem, id, 5f, randomSeed, MAX_RADIUS, root)
         {
-            Stars = new Star[] { new Star(RNG.Next(), true, false) };
+            CelestialBodyIdentifier starID = new CelestialBodyIdentifier(ID, CelestialBodyType.Star, 0);
+            Stars = new Star[] { new Star(starID, RNG.Next(), true, false) };
             int population;
             if (root)
             {

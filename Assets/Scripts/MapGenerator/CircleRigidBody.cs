@@ -2,7 +2,7 @@
 
 namespace MapGenerator
 {
-    public abstract class CircleRigidBody
+    public abstract class CircleRigidBody : EuclideanGraph.IEuclidean
     {
         public Vector2 LocalPosition;
         public Vector2 GlobalPosition { get; protected set; }
@@ -54,6 +54,11 @@ namespace MapGenerator
             {
                 LocalPosition += vector;
             }
+        }
+
+        public Vector2 GetPosition()
+        {
+            return GlobalPosition;
         }
     }
 }

@@ -1,44 +1,91 @@
 ﻿using System.Collections;
-using System.IO;
-using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public AnimationCurve EDGE_PROBABILITY = new AnimationCurve
+    (
+        new Keyframe(2, 0.05f),
+        new Keyframe(20, 0.5f)
+    );
+
     public static GameManager Instance;
 
+    public bool RenderEdges;
     public Gradient StarGradient;
     public GameObject MapGenScreen;
-    public GameObject MapRenderer;
+    public GameObject MapRenderer_Shader;
+    public GameObject MapRenderer_Sprite;
+    public GameObject SeedText;
+    public GameObject GenesisText;
+    public GameObject MenuScreen;
 
     private float TimeStamp;
-    private readonly CelestialBodyType MapSize = CelestialBodyType.Universe;
+    private CelestialBodyType MapSize;
     private CelestialBodies.CelestialBody Map;
+    private Network Network;
+    private bool Menu;
 
     private void Awake()
     {
         Instance = this;
-        CreateWorld();
-        //temp();
+        Menu = true;
     }
 
-    private void temp()
+    private void DelaunayTest()
+    {
+        MapGenerator.ProgressTracker.Initialize();
+
+        MapGenerator.Containers.Container Map = new MapGenerator.Containers.SolarSystem(new CelestialBodyIdentifier(CelestialBodyType.SolarSystem), 1216466133, true);
+        Map.Initialize();
+        MapGenerator.EuclideanGraph.EuclideanGraph<MapGenerator.Containers.Container> graph = new MapGenerator.EuclideanGraph.EuclideanGraph<MapGenerator.Containers.Container>();
+        Util.LinkedList<MapGenerator.Containers.Container> smallBodies = Map.GetAllSmallBodies();
+        foreach (MapGenerator.Containers.Container body in smallBodies)
+        {
+            graph.AddNode(body);
+        }
+        graph.GenerateDelaunayTriangulation();
+    }
+
+    private void LoadGame()
     {
         LoadMap();
-        MapRenderer.GetComponent<MapRendering.MapRenderer>().Initialize(Map);
-        MapRenderer.GetComponent<MapRendering.MapRenderer>().OpenMap();
+        DisplayMap();
     }
 
     public void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1) && Menu)
+        {
+            Menu = false;
+            MenuScreen.SetActive(false);
+            RenderEdges = true;
+            MapSize = CelestialBodyType.Galaxy;
+            InitializeGame();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2) && Menu)
+        {
+            Menu = false;
+            MenuScreen.SetActive(false);
+            RenderEdges = false;
+            MapSize = CelestialBodyType.Universe;
+            InitializeGame();
+        }
         //Debug.Log(1f/Time.deltaTime);
     }
 
-    private void CreateWorld()
+    private void InitializeGame()
     {
         System.Random rng = new System.Random();
         // int seed = 1216466133;
         int seed = rng.Next();
+        SeedText.GetComponent<Text>().text = "Seed = " + seed.ToString();
         rng = new System.Random(seed);
         Debug.Log("Seed = " + seed);
 
@@ -46,47 +93,63 @@ public class GameManager : MonoBehaviour
         MapGenerator.GenerateMap thread = new MapGenerator.GenerateMap(MapSize, rng.Next(), System.Environment.ProcessorCount - 1, OnWorldGenerated);
         thread.Start();
         StartCoroutine(WaitForMapGeneration(thread));
-        MapGenScreen.SetActive(true);
     }
 
     public IEnumerator WaitForMapGeneration(MapGenerator.GenerateMap thread)
     {
-        while(Map == null)
+        MapGenScreen.SetActive(true);
+        while (!thread.IsDone)
         {
+            GenesisText.GetComponent<Text>().text = "Genesis took " + Mathf.FloorToInt(Time.realtimeSinceStartup - TimeStamp) + " seconds";
             thread.Update();
             yield return null;
         }
+        thread.Update();
+        MapGenScreen.SetActive(false);
     }
 
-    private void OnWorldGenerated(MapGenerator.Containers.Container map)
+    private void OnWorldGenerated(MapGenerator.Containers.Container map, List<CelestialBodyIdentifier[]> warpJumps)
     {
         Debug.Log("Genesis Duration = " + (Time.realtimeSinceStartup - TimeStamp) + " seconds");
 
-        CreateMap(map);
+        CreateMap(map, warpJumps);
         SaveMap();
+        DisplayMap();
+    }
 
-        MapRenderer.GetComponent<MapRendering.MapRenderer>().Initialize(Map);
-        MapRenderer.GetComponent<MapRendering.MapRenderer>().OpenMap();
-
-        MapGenScreen.SetActive(false);
+    private void DisplayMap()
+    {
+        if (RenderEdges)
+        {
+            MapRenderer_Sprite.SetActive(true);
+            MapRenderer_Sprite.GetComponent<MapRendering_Sprite.MapRenderer_Sprite>().Initialize(Map, Network);
+            MapRenderer_Sprite.GetComponent<MapRendering_Sprite.MapRenderer_Sprite>().OpenMap();
+        }
+        else
+        {
+            MapRenderer_Shader.SetActive(true);
+            MapRenderer_Shader.GetComponent<MapRendering_Shader.MapRenderer_Shader>().Initialize(Map, Network);
+            MapRenderer_Shader.GetComponent<MapRendering_Shader.MapRenderer_Shader>().OpenMap();
+        }
     }
 
     private void SaveMap()
     {
         Util.LinkedList<byte> linkedList = Map.Serialize();
+        linkedList.Append(Network.Serialize());
         byte[] bytes = new byte[linkedList.Length];
         int i = 0;
         foreach (byte b in linkedList)
         {
             bytes[i++] = b;
         }
-        File.WriteAllBytes("MapInfo.dat", bytes);
+        System.IO.File.WriteAllBytes("MapInfo.dat", bytes);
     }
 
     private void LoadMap()
     {
-        byte[] bytes = File.ReadAllBytes("MapInfo.dat");
-        CelestialBodyType type = (CelestialBodyType)BitConverter.ToInt32(bytes, 4);
+        byte[] bytes = System.IO.File.ReadAllBytes("MapInfo.dat");
+        CelestialBodyType type = (CelestialBodyType)System.BitConverter.ToInt32(bytes, 4);
         if (type == CelestialBodyType.Universe)
         {
             Map = new CelestialBodies.Universe(bytes, 0);
@@ -107,9 +170,12 @@ public class GameManager : MonoBehaviour
         {
             Map = new CelestialBodies.SolarSystem(bytes, 0);
         }
+
+        int offset = System.BitConverter.ToInt32(bytes, 0);
+        Network = new Network(bytes, offset, Map);
     }
 
-    private void CreateMap(MapGenerator.Containers.Container map)
+    private void CreateMap(MapGenerator.Containers.Container map, List<CelestialBodyIdentifier[]> warpJumps)
     {
         if (MapSize == CelestialBodyType.Universe)
         {
@@ -131,5 +197,7 @@ public class GameManager : MonoBehaviour
         {
             Map = new CelestialBodies.SolarSystem((MapGenerator.Containers.SolarSystem)map);
         }
+
+        Network = new Network(warpJumps, Map);
     }
 }

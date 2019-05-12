@@ -8,7 +8,7 @@ namespace MapGenerator.Containers
         private static readonly int MAX_EXPANSES = 20;
         public static readonly float MAX_RADIUS = Expanse.MAX_RADIUS * 4;
 
-        public Universe(int randomSeed, bool root) : base(CelestialBodyType.Universe, 1f, randomSeed, MAX_RADIUS, root)
+        public Universe(CelestialBodyIdentifier id, int randomSeed, bool root) : base(CelestialBodyType.Universe, id, 1f, randomSeed, MAX_RADIUS, root)
         {
             int population;
             if (root)

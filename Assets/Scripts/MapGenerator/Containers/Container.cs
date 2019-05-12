@@ -11,7 +11,7 @@ namespace MapGenerator.Containers
     /// </summary>
     public abstract class Container : CircleRigidBody
     {
-        public static readonly int MAX_ITERATIONS = 1000;
+        private static readonly int MAX_ITERATIONS = 1000;
         public delegate void Callback();
 
         public Expanse[] Expanses { get; protected set; }
@@ -22,6 +22,7 @@ namespace MapGenerator.Containers
         public Planet[] Planets { get; protected set; }
 
         public readonly CelestialBodyType Type;
+        public readonly CelestialBodyIdentifier ID;
         public bool Initialized
         {
             get
@@ -51,10 +52,11 @@ namespace MapGenerator.Containers
         private bool m_Initialized;
         private Callback ExpansesInitializedCallback;
 
-        public Container(CelestialBodyType type, float radius, int randomSeed, float quadtreeRadius, bool root, bool immovable = false) : base(radius, immovable)
+        public Container(CelestialBodyType type, CelestialBodyIdentifier id, float radius, int randomSeed, float quadtreeRadius, bool root, bool immovable = false) : base(radius, immovable)
         {
             AccessToInitialized = new object();
             Type = type;
+            ID = id;
             RNG = new System.Random(randomSeed);
             Quadtree = new Quadtree(this, quadtreeRadius, -quadtreeRadius, -quadtreeRadius, quadtreeRadius);
             Initialized = false;
@@ -69,9 +71,11 @@ namespace MapGenerator.Containers
         protected void AllocateExpanses(int number)
         {
             Expanses = new Expanse[number];
+            CelestialBodyIdentifier newID;
             for (int i = 0; i < Expanses.Length; i++)
             {
-                Expanses[i] = new Expanse(RNG.Next(), false);
+                newID = new CelestialBodyIdentifier(ID, CelestialBodyType.Expanse, i);
+                Expanses[i] = new Expanse(newID, RNG.Next(), false);
             }
         }
 
@@ -112,9 +116,11 @@ namespace MapGenerator.Containers
         protected void AllocateGalaxies(int number)
         {
             Galaxies = new Galaxy[number];
+            CelestialBodyIdentifier newID;
             for (int i = 0; i < Galaxies.Length; i++)
             {
-                Galaxies[i] = new Galaxy(RNG.Next(), false);
+                newID = new CelestialBodyIdentifier(ID, CelestialBodyType.Galaxy, i);
+                Galaxies[i] = new Galaxy(newID, RNG.Next(), false);
             }
         }
 
@@ -132,9 +138,11 @@ namespace MapGenerator.Containers
         protected void AllocateSectors(int number)
         {
             Sectors = new Sector[number];
+            CelestialBodyIdentifier newID;
             for (int i = 0; i < Sectors.Length; i++)
             {
-                Sectors[i] = new Sector(RNG.Next(), false);
+                newID = new CelestialBodyIdentifier(ID, CelestialBodyType.Sector, i);
+                Sectors[i] = new Sector(newID, RNG.Next(), false);
             }
         }
 
@@ -152,9 +160,11 @@ namespace MapGenerator.Containers
         protected void AllocateSolarSystems(int number)
         {
             SolarSystems = new SolarSystem[number];
+            CelestialBodyIdentifier newID;
             for (int i = 0; i < SolarSystems.Length; i++)
             {
-                SolarSystems[i] = new SolarSystem(RNG.Next(), false);
+                newID = new CelestialBodyIdentifier(ID, CelestialBodyType.SolarSystem, i);
+                SolarSystems[i] = new SolarSystem(newID, RNG.Next(), false);
             }
         }
 
@@ -172,9 +182,11 @@ namespace MapGenerator.Containers
         protected void AllocateStars(int number)
         {
             Stars = new Star[number];
+            CelestialBodyIdentifier newID;
             for (int i = 0; i < Stars.Length; i++)
             {
-                Stars[i] = new Star(RNG.Next(), false, false);
+                newID = new CelestialBodyIdentifier(ID, CelestialBodyType.Star, i);
+                Stars[i] = new Star(newID, RNG.Next(), false, false);
             }
         }
 
@@ -192,9 +204,11 @@ namespace MapGenerator.Containers
         protected void AllocatePlanets(int number)
         {
             Planets = new Planet[number];
+            CelestialBodyIdentifier newID;
             for (int i = 0; i < Planets.Length; i++)
             {
-                Planets[i] = new Planet(RNG.Next(), false);
+                newID = new CelestialBodyIdentifier(ID, CelestialBodyType.Planet, i);
+                Planets[i] = new Planet(newID, RNG.Next(), false);
             }
         }
 
@@ -321,6 +335,54 @@ namespace MapGenerator.Containers
                     Planets[i].CalculateGlobalPositions(GlobalPosition);
                 }
             }
+        }
+
+        public Util.LinkedList<Container> GetAllSmallBodies()
+        {
+            Util.LinkedList<Container> bodies = new Util.LinkedList<Container>();
+            if (Expanses != null)
+            {
+                foreach (Expanse expanse in Expanses)
+                {
+                    bodies.Append(expanse.GetAllSmallBodies());
+                }
+            }
+            if (Galaxies != null)
+            {
+                foreach (Galaxy galaxy in Galaxies)
+                {
+                    bodies.Append(galaxy.GetAllSmallBodies());
+                }
+            }
+            if (Sectors != null)
+            {
+                foreach (Sector sector in Sectors)
+                {
+                    bodies.Append(sector.GetAllSmallBodies());
+                }
+            }
+            if (SolarSystems != null)
+            {
+                foreach (SolarSystem solarSystem in SolarSystems)
+                {
+                    bodies.Append(solarSystem.GetAllSmallBodies());
+                }
+            }
+            if (Stars != null)
+            {
+                foreach (Star star in Stars)
+                {
+                    bodies.AddLast(star);
+                }
+            }
+            if (Planets != null)
+            {
+                foreach (Planet planet in Planets)
+                {
+                    bodies.AddLast(planet);
+                }
+            }
+            return bodies;
         }
     }
 }
